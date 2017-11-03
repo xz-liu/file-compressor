@@ -7,7 +7,7 @@
 #include <memory>
 
 template<class T, size_t BEGIN = 100>
-class vector{
+class vector {
 protected:
     T *impl_begin;
     T *impl_end;
@@ -70,15 +70,28 @@ public:
         init_cap(0);
     }
 
+    vector(std::initializer_list<T> init_list)
+            : vector() {
+        for (auto x:init_list) {
+            push_back(x);
+        }
+    }
+
     vector(const vector &rhs) {
         init_cap(rhs.size());
-        memcpy(impl_begin, rhs.impl_begin, sizeof(T) * rhs.size());
+        T *now = impl_begin;
+        for (const auto &x:rhs) {
+            new(now++)T(x);
+        }
         impl_end = impl_begin + rhs.size();
     }
 
     vector &operator=(const vector &rhs) {
         resize_cap(rhs.size(), false);
-        memcpy(impl_begin, rhs.impl_begin, sizeof(T) * rhs.size());
+        T *now = impl_begin;
+        for (const auto &x:rhs) {
+            new(now++)T(x);
+        }
         impl_end = impl_begin + rhs.size();
     }
 
@@ -135,8 +148,9 @@ public:
             impl_end = _end;
         }
     }
-    void erase(size_t pos){
-        erase(begin()+pos);
+
+    void erase(size_t pos) {
+        erase(begin() + pos);
     }
 
     void insert(iterator iter, const T &value) {
@@ -160,7 +174,6 @@ public:
         return impl_begin[rank];
     }
 };
-
 
 
 #define DATA_STRUCTURE_EXP_VECTOR_H

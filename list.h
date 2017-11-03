@@ -6,132 +6,163 @@
 #define DATA_STRUCTURE_EXP_LIST_H
 
 #include "list_node.h"
+#include <initializer_list>
 
-template <class T>
-class list{
+template<class T>
+class list {
 protected:
     list_node<T> *head;
     list_node<T> *tail;
     size_t list_size;
-    void next_node(list_node<T>*& node){
-        node=node->next;
+
+    void next_node(list_node<T> *&node) {
+        node = node->next;
     }
-    void prev_node(list_node<T>*& node){
-        node=node->prev;
+
+    void prev_node(list_node<T> *&node) {
+        node = node->prev;
     }
+
 public:
     using iterator=list_iterator<T>;
     using const_iterator=const_list_iterator<T>;
 
-    size_t size(){
+    size_t size() const {
         return list_size;
     }
-    bool empty(){
+
+    bool empty() const {
         return !list_size;
     }
-    list():head(nullptr),tail(nullptr),list_size(0){}
-    list(const list& rhs){(*this)=rhs;}
-    list&operator=(const list& rhs){
+
+    list() : head(nullptr), tail(nullptr), list_size(0) {}
+
+    list(const list &rhs) : list() {
+        for (const auto &x:rhs) {
+            push_back(x);
+        }
+    }
+
+    list(std::initializer_list<T> init_list) : list() {
+        for (auto x:init_list) {
+            push_back(x);
+        }
+    }
+
+    list &operator=(const list &rhs) {
         clear();
-        for(auto &x:rhs){
+        for (const auto &x:rhs) {
             push_back(x);
         }
         return *this;
     }
-    virtual ~list(){
+
+    virtual ~list() {
         clear();
     }
-    void clear(){
-        list_size=0;
-        while (head&&head!=tail){
-            auto tmp=head;
+
+    void clear() {
+        while (head && head != tail && list_size--) {
+            auto tmp = head;
             next_node(head);
             list_node<T>::erase(tmp);
         }
     }
-    void push_back(const T& value){
-        if(tail){
+
+    void push_back(const T &value) {
+        if (tail) {
             list_node<T>::insert(tail,
-                         new list_node<T>(value, nullptr,tail));
+                                 new list_node<T>(value, nullptr, tail));
             next_node(tail);
         } else {
             if (head) {
                 list_node<T>::insert(head,
-                     tail= new list_node<T>(value, nullptr,head));
+                                     tail = new list_node<T>(value, nullptr, head));
             } else {
                 head = new list_node<T>(value);
             }
         }
         list_size++;
     }
-    void push_front(const T& value){
-        if(head){
+
+    void push_front(const T &value) {
+        if (head) {
             list_node<T>::insert_before(head,
-                                 new list_node<T>(value,head));
+                                        new list_node<T>(value, head));
             prev_node(head);
         } else {
             head = new list_node<T>(value);
         }
         list_size++;
     }
-    void pop_back(){
-        if(tail){
-            list_node<T> * tmp=tail;
+
+    void pop_back() {
+        if (tail) {
+            list_node<T> *tmp = tail;
             prev_node(tail);
-            list_node<T>::erase(tail,tmp);
+            list_node<T>::erase(tail, tmp);
             list_size--;
-        } else if(head){
+        } else if (head) {
             list_node<T>::erase(head);
-            head=tail= nullptr;
+            head = tail = nullptr;
             list_size--;
         }
     }
 
-    void pop_front(){
-        if (head){
-            list_node<T> * tmp=head;
+    void pop_front() {
+        if (head) {
+            list_node<T> *tmp = head;
             next_node(head);
             list_node<T>::erase(tmp);
             list_size--;
         }
     }
 
-    iterator begin(){
-        return iterator(head);
-    }
-    iterator end(){
-        return iterator(nullptr);
+    iterator begin() {
+        return iterator(head, tail);
     }
 
-    const_iterator begin()const {
-        return const_iterator(head);
-    }
-    const_iterator end()const{
-        return const_iterator(nullptr);
-    }
-    const_iterator cbegin()const {
-        return const_iterator(head);
-    }
-    const_iterator cend()const{
-        return const_iterator(nullptr);
+    iterator end() {
+        return iterator(nullptr, tail);
     }
 
-    void insert(list_iterator<T> pos, const T& val){
-        list_node<T>::insert(pos.node,val);
+    const_iterator begin() const {
+        return const_iterator(head, tail);
     }
-    void erase(list_iterator<T> pos){
-        list_node<T>::erase(pos.node->prev,pos.node);
+
+    const_iterator end() const {
+        return const_iterator(nullptr, tail);
     }
-    list_iterator<T> find(const T& val){
+
+    const_iterator cbegin() const {
+        return const_iterator(head, tail);
+    }
+
+    const_iterator cend() const {
+        return const_iterator(nullptr, tail);
+    }
+
+    void insert(list_iterator<T> pos, const T &val) {
+        list_node<T>::insert(pos.node, val);
+        list_size++;
+    }
+
+    void erase(list_iterator<T> pos) {
+        list_node<T>::erase(pos.node->prev, pos.node);
+        list_size--;
+    }
+
+    list_iterator<T> find(const T &val) {
         if (empty())return end();
-        for(list_iterator<T> iter=begin();iter!=end();iter++){
-            if (*iter==val)return iter;
+        for (list_iterator<T> iter = begin(); iter != end(); iter++) {
+            if (*iter == val)return iter;
         }
         return end();
     }
-    T&operator[](size_t pos){
-        auto b=begin();
-        for(;pos--;b++);
+
+    T &operator[](size_t pos) {
+        auto b = begin();
+        for (; pos--; b++);
         return *b;
     }
 };

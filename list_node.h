@@ -4,14 +4,22 @@
 
 #ifndef DATA_STRUCTURE_EXP_LIST_NODE_H
 #define DATA_STRUCTURE_EXP_LIST_NODE_H
-template <class T>
+
+template<class T>
 class list;
-template <class T>
+
+template<class T>
 class list_iterator;
+
+template<class T>
+class const_list_iterator;
 
 template<class T>
 class list_node {
     friend class list_iterator<T>;
+
+    friend class const_list_iterator<T>;
+
     T value;
 public:
     list_node *next;
@@ -80,51 +88,73 @@ public:
 };
 
 template<class T>
-class list_iterator{
+class list_iterator {
 protected:
-    list_node<T> * node;
+    list_node<T> *node;
+    list_node<T> *end_prev;
+
     friend class list<T>;
+
 public:
-    explicit list_iterator(list_node<T> * pointer= nullptr)
-            :node(pointer){}
-    T*operator->(){
+    explicit list_iterator(list_node<T> *pointer = nullptr,
+                           list_node<T> *end_prev = nullptr)
+            : node(pointer), end_prev(end_prev) {}
+
+    T *operator->() {
         return &node->value;
     };
-    T&operator* (){
+
+    T &operator*() {
         return node->value;
     }
-    list_iterator&operator++(){
-        node=node->next;
+
+    list_iterator &operator++() {
+        node = node->next;
         return *this;
     }
-    list_iterator&operator--(){
-        node=node->prev;
+
+    list_iterator &operator--() {
+        node = node ? node->prev : end_prev;
         return *this;
     }
-    list_iterator operator++(int){
+
+    list_iterator operator++(int) {
         return ++(*this);
     }
-    list_iterator operator--(int){
+
+    list_iterator operator--(int) {
         return --(*this);
     }
-    bool operator==(const list_iterator<T>& iterator)const{
-        return node==iterator.node;
+
+    bool operator==(const list_iterator<T> &iterator) const {
+        return node == iterator.node;
     }
-    bool operator!=(const list_iterator<T>& iterator)const{
-        return node!=iterator.node;
+
+    bool operator!=(const list_iterator<T> &iterator) const {
+        return node != iterator.node;
     }
-    list_iterator&operator=(list_iterator rhs)= default;
+
+    list_iterator &operator=(const list_iterator &rhs)= default;
+
+    list_iterator(const list_iterator &rhs) = default;
 };
 
-template <class T>
-class const_list_iterator:public list_iterator<T>{
+template<class T>
+class const_list_iterator : public list_iterator<T> {
 public:
-    explicit const_list_iterator(list_node<T>* node)
-        :list_iterator<T>(node){}
-    const T* const operator->()const{
+    explicit const_list_iterator(list_node<T> *pointer = nullptr,
+                                 list_node<T> *end_prev = nullptr)
+            : list_iterator<T>(pointer, end_prev) {}
+
+    const_list_iterator &operator=(const const_list_iterator &rhs)= default;
+
+    const_list_iterator(const const_list_iterator &rhs) = default;
+
+    const T *const operator->() const {
         return &list_iterator<T>::node->value;
     };
-    const T&operator* ()const {
+
+    const T &operator*() const {
         return list_iterator<T>::node->value;
     }
 };
