@@ -72,12 +72,12 @@ public:
     void push_back(const T &value) {
         if (tail) {
             list_node<T>::insert(tail,
-                                 new list_node<T>(value, nullptr, tail));
+                 new list_node<T>(value, nullptr, tail));
             next_node(tail);
         } else {
             if (head) {
                 list_node<T>::insert(head,
-                                     tail = new list_node<T>(value, nullptr, head));
+                 tail = new list_node<T>(value, nullptr, head));
             } else {
                 head = new list_node<T>(value);
             }
@@ -88,7 +88,7 @@ public:
     void push_front(const T &value) {
         if (head) {
             list_node<T>::insert_before(head,
-                                        new list_node<T>(value, head));
+                new list_node<T>(value, head));
             prev_node(head);
         } else {
             head = new list_node<T>(value);

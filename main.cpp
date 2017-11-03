@@ -18,38 +18,7 @@ void output_list(const Seq& list){
     }
     cout<<endl;
 }
-template<class T, class Comp>
-bool in_range(const T &target,  T mink,
-               T maxk, Comp comp) {
-    return comp(mink, target) && comp(target, maxk);
-};
 
-template<class T, class Comp>
-void delete_range(list<T> &lst,
-           T mink, T maxk,
-          Comp comp = std::less<T>()) {
-    auto _begin=lst.begin();
-    while (_begin!=lst.end()) {
-        if(in_range(*_begin,mink,maxk,comp)){
-            auto tmp=_begin;
-            _begin++;
-            lst.erase(tmp);
-        } else{
-            _begin++;
-        }
-    }
-}
-template <class T>
-void delete_range(list<T> &lst,T mink,T maxk){
-    delete_range(lst,mink,maxk,std::less<T>());
-}
-
-template<class BidirIt>
-void reverse(BidirIt first, BidirIt last) {
-    while ((first != last) && (first != --last)) {
-        std::swap(*first, *last);first++;
-    }
-}
 
 template <class T,class Comp>
 void merge_list(const list<T> &first, const list<T> &second,list<T>& result,Comp comp){
@@ -80,6 +49,53 @@ void merge_list(const list<T>& first,const list<T> &second
     merge_list(first, second,result, std::less<T>());
 }
 
+template <class T,class Comp>
+void insert_sorted(list<T>& lst,const T& val,Comp comp){
+    auto iter=lst.begin();
+    while (iter!=lst.end()){
+        if(comp(val,*iter)){ break;}
+        iter++;
+    }
+    iter--;
+    lst.insert(iter,val);
+}
+template <class T>
+void insert_sorted(list<T>& lst,const T& val){
+    insert_sorted(lst,val,std::less<T>());
+}
+
+template<class T, class Comp>
+bool in_range(const T &target,  T mink,
+              T maxk, Comp comp) {
+    return comp(mink, target) && comp(target, maxk);
+};
+
+template<class T, class Comp>
+void delete_range(list<T> &lst,
+                  T mink, T maxk,
+                  Comp comp = std::less<T>()) {
+    auto _begin=lst.begin();
+    while (_begin!=lst.end()) {
+        if(in_range(*_begin,mink,maxk,comp)){
+            auto tmp=_begin;
+            _begin++;
+            lst.erase(tmp);
+        } else{
+            _begin++;
+        }
+    }
+}
+template <class T>
+void delete_range(list<T> &lst,T mink,T maxk){
+    delete_range(lst,mink,maxk,std::less<T>());
+}
+
+template<class BidirIt>
+void reverse(BidirIt first, BidirIt last) {
+    while ((first != last) && (first != --last)) {
+        std::swap(*first, *last);first++;
+    }
+}
 
 int main() {
     cout<<"Test list"<<endl;
@@ -102,6 +118,8 @@ int main() {
     output_list(mergeResult);
     output_list(toMerge);
     merge_list(listInt,toMerge,mergeResult);
+    output_list(mergeResult);
+    insert_sorted(mergeResult,5);
     output_list(mergeResult);
     cout<<"Test vector"<<endl;
     vector<int> vec{1,2,3,4,5};
