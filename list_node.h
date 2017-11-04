@@ -119,11 +119,15 @@ public:
     }
 
     list_iterator operator++(int) {
-        return ++(*this);
+        auto ret=*this;
+        ++(*this);
+        return ret;
     }
 
     list_iterator operator--(int) {
-        return --(*this);
+        auto ret=*this;
+        --(*this);
+        return ret;
     }
 
     bool operator==(const list_iterator<T> &iterator) const {

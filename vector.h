@@ -3,7 +3,7 @@
 //
 
 #ifndef DATA_STRUCTURE_EXP_VECTOR_H
-
+#define DATA_STRUCTURE_EXP_VECTOR_H
 #include <memory>
 
 template<class T, size_t BEGIN = 100>
@@ -59,10 +59,6 @@ public:
     size_t size() const {
         return impl_end - impl_begin;
     }
-
-    T &front() { return *impl_begin; }
-
-    T &back() { return *impl_end; }
 
     virtual bool empty() { return !size(); }
 
@@ -153,6 +149,14 @@ public:
         erase(begin() + pos);
     }
 
+    T& back(){
+        return impl_end[-1];
+    }
+
+    T& front(){
+        return *impl_begin;
+    }
+
     void insert(iterator iter, const T &value) {
         resize_cap(size());
         iterator back = end();
@@ -176,6 +180,5 @@ public:
 };
 
 
-#define DATA_STRUCTURE_EXP_VECTOR_H
 
 #endif //DATA_STRUCTURE_EXP_VECTOR_H

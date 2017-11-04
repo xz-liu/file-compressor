@@ -118,6 +118,14 @@ public:
         }
     }
 
+    T& back(){
+        return *tail;
+    }
+
+    T& front(){
+        return *head;
+    }
+
     iterator begin() {
         return iterator(head, tail);
     }
@@ -142,19 +150,18 @@ public:
         return const_iterator(nullptr, tail);
     }
 
-    void insert(list_iterator<T> pos, const T &val) {
+    void insert(iterator pos, const T &val) {
         list_node<T>::insert(pos.node, val);
         list_size++;
     }
 
-    void erase(list_iterator<T> pos) {
+    void erase(iterator pos) {
         list_node<T>::erase(pos.node->prev, pos.node);
         list_size--;
     }
 
-    list_iterator<T> find(const T &val) {
-        if (empty())return end();
-        for (list_iterator<T> iter = begin(); iter != end(); iter++) {
+    iterator find(const T &val) {
+        for (iterator iter = begin(); iter != end(); iter++) {
             if (*iter == val)return iter;
         }
         return end();
