@@ -39,10 +39,9 @@ bool check_expression(const std::string& exp) {
     stack<char> brackets;
     for (char c:exp) {
         if (std::string("{<([").find(c)
-                 != std::string::npos) {
+                 != std::string::npos)
             brackets.push(c);
-        }
-        else if (c == [&]() ->char {
+        else if (c == [&](){
                  switch (brackets.top()) {
                      case '(':return ')';
                      case '[':return ']';

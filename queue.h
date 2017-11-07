@@ -18,7 +18,7 @@ public:
         list<T>::push_back(val);
     }
     void pop(){
-        list<T>::pop_back();
+        list<T>::pop_front();
     }
     size_t size(){
         return list<T>::size();
