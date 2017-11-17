@@ -10,7 +10,7 @@
 #include <numeric>
 
 template <class T>
-struct graph_mat:public vector<vector<T>>{
+struct graph_mat:vector<vector<T>>{
     explicit graph_mat(int N)
     :vector<vector<T>>(N,vector<T>(N,0)){}
     int in_degree(size_t pos)const {
@@ -27,7 +27,7 @@ struct graph_mat:public vector<vector<T>>{
 };
 
 template <class T>
-struct list_edge{
+struct graph_edge{
     size_t from;
     size_t to;
     T val;
@@ -40,7 +40,7 @@ struct graph_node{
 
 template <class Node,class Edge>
 struct graph_list{
-    vector<list_edge<Edge>> edges;
+    vector<graph_edge<Edge>> edges;
     vector<vector<graph_node>> out,in;
     vector<Node> node_vals;
     explicit graph_list(size_t N,const Node& x=Node())
@@ -80,11 +80,31 @@ struct graph_list{
         return in_degree(pos)+out_degree(pos);
     }
 
-    list_edge<Edge> query_edge(size_t u,size_t v){
+    graph_edge<Edge> query_edge(size_t u,size_t v){
         return edges[out[u][v].edge_ref];
     }
 
 };
+
+const int inf=0x3f3f3f3f;
+void dijkstra(const graph_mat<int> &G,size_t v,vector<int> &res){
+    size_t n;res.resize(n=G.size());
+    vector<bool> vis(n, false);
+    for (int i = 0; i <n ; ++i) {
+        res[i]=(i?inf:0);
+    }
+    for (int i = 0; i < n; ++i) {
+        int x,m=inf;
+        for (int y = 0; y < n; ++y) {
+            if(!vis[y]&&res[y]<=m)m=res[x=y];
+        }
+        vis[x]=true;
+        for (int y = 0; y < n; ++y) {
+            res[y]=std::min(res[y],res[x]+G[x][y]);
+        }
+    }
+}
+
 
 
 #endif //DATA_STRUCTURE_EXP_GRAPH_H

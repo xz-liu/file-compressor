@@ -119,11 +119,11 @@ public:
     }
 
     T& back(){
-        return *tail;
+        return **tail;
     }
 
     T& front(){
-        return *head;
+        return **head;
     }
 
     iterator begin() {

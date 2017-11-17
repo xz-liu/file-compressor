@@ -9,7 +9,10 @@
 
 #define trav(type_name)\
     void trav_##type_name(visit_func vis){if(root)root->trav_##type_name(vis);}\
-    void trav_##type_name(const_visit_func vis)const{if(root)root->trav_##type_name(vis);}
+    void trav_##type_name(const_visit_func vis)const {if(root)root->trav_##type_name(vis);}
+
+template <class T>
+void pre_order_init(std::istream& in,bin_tree<T>& new_tree);
 
 template <class T>
 class bin_tree {
@@ -18,8 +21,8 @@ protected:
     using ptr=typename bintree_node<T>::bnode_ptr;
     using const_ptr=typename bintree_node<T>::const_bnode_ptr;
     int tree_size;
-    ptr root;
-/**
+
+    /**
  * template <typename T> int BinTree<T>::updateHeight ( BinNodePosi(T) x ) //更新节点x高度
 { return x->height = 1 + max ( stature ( x->lc ), stature ( x->rc ) ); } //具体规则，因树而异
 
@@ -31,7 +34,8 @@ template <typename T> void BinTree<T>::updateHeightAbove ( BinNodePosi(T) x ) //
  */
 
     virtual int update_height(ptr x){
-        return x->node_height=1+std::max(node::stature(x->lc),node::stature(x->rc));
+        return x->node_height=
+          1+std::max(node::stature(x->lc),node::stature(x->rc));
     }
 
     void update_height_above(ptr x){
@@ -56,8 +60,8 @@ template <typename T> void BinTree<T>::updateHeightAbove ( BinNodePosi(T) x ) //
         int n=1+remove_at(x->lc)+remove_at(x->rc);
         delete x;return n;
     }
-
-    friend void pre_order_init(std::istream&,bin_tree<T>& );
+    template <class X>
+    friend void pre_order_init(std::istream&,bin_tree<X>& );
 public:
     using visit_func=typename node::visit_func;
     using const_visit_func=typename node::const_visit_func;
@@ -65,6 +69,7 @@ public:
     using const_iterator= const_bintree_iterator<T>;
 
     bin_tree():tree_size(0),root(nullptr){}
+    virtual ~bin_tree(){clear();}
 
     virtual void remove_subtree(iterator iter){
         ptr under=iter.node;
@@ -76,9 +81,12 @@ public:
         }
     }
 
+    virtual void clear(){remove_subtree(root);}
+
     trav(level)
     trav(in_order)
     trav(pre_order)
+    trav(post_order)
 
     T& front(){ return *begin(); }
     const T& front()const { return *cbegin();}
@@ -111,8 +119,8 @@ public:
         return const_iterator();
     }
     virtual const_iterator end()const{ return cend();}
-};
 
-bin_tree<int> bin_tree1;
+    ptr root;
+};
 
 #endif //DATA_STRUCTURE_EXP_BIN_TREE_H

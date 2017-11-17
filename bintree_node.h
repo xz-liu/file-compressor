@@ -7,6 +7,7 @@
 
 #include <functional>
 #include <cstdlib>
+#include <queue>
 #include "queue.h"
 
 template <class T>
@@ -16,8 +17,8 @@ template <class T>
 struct bintree_node {
     using bnode_ptr=bintree_node *;
     using const_bnode_ptr=const bintree_node *;
-    using visit_func=std::function<void(T &)> &;
-    using const_visit_func=std::function<void(const T &)> &;
+    using visit_func=std::function<void(T &)> ;
+    using const_visit_func=std::function<void(const T &)> ;
     T val;
     bintree_node *parent, *lc, *rc;
     int node_height;
@@ -173,13 +174,18 @@ struct bintree_node {
     }
 
     void trav_level(visit_func visit){
-        queue<bnode_ptr> Q;
+        std::queue<bnode_ptr> Q;
+        using namespace std;
         Q.push(this);
         while (!Q.empty()){
             bnode_ptr x=Q.front();
             Q.pop();visit(x->val);
-            if(x->has_lchild())Q.push(x->lc);
-            if(x->has_rchild())Q.push(x->rc);
+            if(x->has_lchild()){
+                Q.push(x->lc);
+            }
+            if(x->has_rchild()){
+                Q.push(x->rc);
+            }
         }
     }
 
@@ -239,6 +245,9 @@ public:
     bintree_iterator rchild(){
         return (node->rc);
     }
+    bintree_iterator parent(){
+        return (node->parent);
+    }
     bintree_iterator create_lc(const T& v){
         if(node->has_lchild())return nullptr;
         return node->insert_as_lchild(v);
@@ -246,6 +255,12 @@ public:
     bintree_iterator create_rc(const T& v){
         if(node->has_rchild())return nullptr;
         return node->insert_as_rchild(v);
+    }
+    bool operator==(bintree_iterator it)const {
+        return node==it.node;
+    }
+    bool  operator!=(bintree_iterator it)const {
+        return node!=it.node;
     }
 };
 
@@ -284,8 +299,15 @@ public:
     const_bintree_iterator rchild()const {
         return (node->rc);
     }
+    const_bintree_iterator parent()const{
+        return (node->parent);
+    }
+    bool operator==(const_bintree_iterator it)const {
+        return node==it.node;
+    }
+    bool  operator!=(const_bintree_iterator it)const {
+        return node!=it.node;
+    }
 };
-
-struct void_status{};
 
 #endif //DATA_STRUCTURE_EXP_BINTREE_NODE_H
