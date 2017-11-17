@@ -9,28 +9,32 @@
 #include <cstdlib>
 #include "queue.h"
 
+template <class T>
+class bin_tree;
 
-template <class T,class Status>
+template <class T>
 struct bintree_node {
     using bnode_ptr=bintree_node *;
-    using const_bnode_ptr=const bintree_node const*;
+    using const_bnode_ptr=const bintree_node *;
     using visit_func=std::function<void(T &)> &;
     using const_visit_func=std::function<void(const T &)> &;
     T val;
     bintree_node *parent, *lc, *rc;
     int node_height;
     int npl;
-    Status status;
+    static int stature(bnode_ptr ptr) {
+        return ptr ? ptr->node_height : -1;
+    }
 
     bintree_node()
             : parent(nullptr), lc(nullptr), rc(nullptr),
-              node_height(0), npl(1), status() {}
+              node_height(0), npl(1){}
 
-    bintree_node(const T &val, bnode_ptr parent = nullptr,
+    explicit bintree_node(const T &val, bnode_ptr parent = nullptr,
                  bnode_ptr lchild = nullptr, bnode_ptr rchild = nullptr,
-                 int height = 0, int null_path_length = 1, Status status)
+                 int height = 0, int null_path_length = 1)
             : val(val), parent(parent), lc(lchild), rc(rchild), node_height(height),
-              npl(null_path_length), Status(status) {}
+              npl(null_path_length) {}
 
     static void move_to_lc(bnode_ptr &ptr) {
         ptr = ptr->lc;
@@ -90,12 +94,10 @@ struct bintree_node {
                parent->parent->lc;
     }
 
-    bnode_ptr &&from_parent_to() {
-        return is_root() ? this : is_lchild() ? parent->lc : parent->rc;
-    }
-
-    int stature() {
-        return node_height ? node_height : -1;
+    void set_parent_ref(bnode_ptr ptr){
+        if (is_root())return;
+        if(is_lchild())parent->lc=ptr;
+        else parent->rc=ptr;
     }
 
     int size() {
@@ -201,27 +203,20 @@ struct bintree_node {
     }
 };
 
-template <class T,class S>
+template <class T>
 class bintree_iterator{
 protected:
     using bnode_ptr= typename
-    bintree_node<T,S>::bnode_ptr;
-    using const_bnode_ptr= typename
-    bintree_node<T,S>::const_bnode_ptr;
-    union {
-        bnode_ptr ptr;
-        const_bnode_ptr const_ptr;
-    }node;
+    bintree_node<T>::bnode_ptr;
+    bnode_ptr node;
+    friend class bin_tree<T>;
 public:
-    explicit bintree_iterator(bnode_ptr node= nullptr){
-        this->node.ptr= node;
-    }
-    explicit bintree_iterator(const_bnode_ptr node= nullptr){
-        this->node.const_ptr= node;
+    bintree_iterator(bnode_ptr node= nullptr){
+        this->node= node;
     }
 
      bintree_iterator&operator++(){
-        node.ptr=node.ptr->next();
+        node=node->next();
         return *this;
     }
 
@@ -231,22 +226,42 @@ public:
         return ret;
     }
 
-    virtual T &operator*(){
-        return node.ptr->val;
+    T &operator*(){
+        return node->val;
     }
-    virtual T*operator->(){
-        return &node.ptr->val;
+    T*operator->(){
+        return &node->val;
+    }
+
+    bintree_iterator lchild(){
+        return (node->lc);
+    }
+    bintree_iterator rchild(){
+        return (node->rc);
+    }
+    bintree_iterator create_lc(const T& v){
+        if(node->has_lchild())return nullptr;
+        return node->insert_as_lchild(v);
+    }
+    bintree_iterator create_rc(const T& v){
+        if(node->has_rchild())return nullptr;
+        return node->insert_as_rchild(v);
     }
 };
 
-template <class T,class S>
-class const_bintree_iterator:public bintree_iterator<T,S> {
+template <class T>
+class const_bintree_iterator {
+    using const_bnode_ptr= typename
+    bintree_node<T>::const_bnode_ptr;
+    const_bnode_ptr node;
+    friend class bin_tree<T>;
 public:
-    explicit const_bintree_iterator(const_bnode_ptr node = nullptr)
-            : bintree_iterator<T, S>(node) {}
+    const_bintree_iterator(const_bnode_ptr node= nullptr){
+        this->node= node;
+    }
 
     const_bintree_iterator &operator++() {
-        node.const_ptr = node.const_ptr->next();
+        node = node->next();
         return *this;
     }
 
@@ -256,12 +271,18 @@ public:
         return ret;
     }
 
-    T &operator*() {
-        return node.const_ptr->val;
+    const T& operator*  () const{
+        return node->val;
     }
 
-    T *operator->() {
-        return &node.const_ptr->val;
+    T const * operator->() const{
+        return &node->val;
+    }
+    const_bintree_iterator lchild()const {
+        return (node->lc);
+    }
+    const_bintree_iterator rchild()const {
+        return (node->rc);
     }
 };
 
