@@ -50,6 +50,7 @@ struct bintree_node {
     }
 
     bool has_parent() const {
+        if(!this)return true;
         return (bool) parent;
     }
 
@@ -82,20 +83,21 @@ struct bintree_node {
     }
 
     bool is_leaf() const{
-        return !has_child();
+        return !(this&&has_child());
     }
 
-    bnode_ptr sibling() {
+    bnode_ptr& sibling() {
         return is_lchild() ? parent->rc : parent->lc;
     }
 
-    bnode_ptr uncle() {
+    bnode_ptr& uncle() {
         return parent->is_lchild() ?
                parent->parent->rc :
                parent->parent->lc;
     }
 
     void set_parent_ref(bnode_ptr ptr){
+        if (!this)return;
         if (is_root())return;
         if(is_lchild())parent->lc=ptr;
         else parent->rc=ptr;
@@ -119,15 +121,15 @@ struct bintree_node {
         }
         return s;
     }
-    const_bnode_ptr next()const{
+    const_bnode_ptr& next()const{
         return (const_cast<bnode_ptr >(this))->next();
     }
 
-    bnode_ptr insert_as_lchild(T const &val) {
+    bnode_ptr& insert_as_lchild(T const &val) {
         return lc = new bintree_node(val, this);
     }
 
-    bnode_ptr insert_as_rchild(T const &val) {
+    bnode_ptr& insert_as_rchild(T const &val) {
         return rc = new bintree_node(val, this);
     }
 
@@ -174,29 +176,25 @@ struct bintree_node {
     }
 
     void trav_level(visit_func visit){
-        std::queue<bnode_ptr> Q;
+        queue<bnode_ptr> Q;
         using namespace std;
         Q.push(this);
         while (!Q.empty()){
             bnode_ptr x=Q.front();
             Q.pop();visit(x->val);
-            if(x->has_lchild()){
-                Q.push(x->lc);
-            }
-            if(x->has_rchild()){
-                Q.push(x->rc);
-            }
+            if(x->has_lchild()){ Q.push(x->lc); }
+            if(x->has_rchild()){ Q.push(x->rc); }
         }
     }
 
-    void trav_level(const_visit_func visit)const{
+    void trav_level(const_visit_func visit)const {
         queue<const_bnode_ptr> Q;
         Q.push(this);
-        while (!Q.empty()){
-            const_bnode_ptr x=Q.front();
+        while (!Q.empty()) {
+            const_bnode_ptr x = Q.front();
             Q.pop();visit(x->val);
-            if(x->has_lchild())Q.push(x->lc);
-            if(x->has_rchild())Q.push(x->rc);
+            if (x->has_lchild()) { Q.push(x->lc); }
+            if (x->has_rchild()) { Q.push(x->rc); }
         }
     }
 
@@ -206,107 +204,6 @@ struct bintree_node {
 
     bool operator==(bintree_node const &bn) const {
         return val == bn.val;
-    }
-};
-
-template <class T>
-class bintree_iterator{
-protected:
-    using bnode_ptr= typename
-    bintree_node<T>::bnode_ptr;
-    bnode_ptr node;
-    friend class bin_tree<T>;
-public:
-    bintree_iterator(bnode_ptr node= nullptr){
-        this->node= node;
-    }
-
-     bintree_iterator&operator++(){
-        node=node->next();
-        return *this;
-    }
-
-     bintree_iterator operator++(int){
-        auto ret=*this;
-        (*this)++;
-        return ret;
-    }
-
-    T &operator*(){
-        return node->val;
-    }
-    T*operator->(){
-        return &node->val;
-    }
-
-    bintree_iterator lchild(){
-        return (node->lc);
-    }
-    bintree_iterator rchild(){
-        return (node->rc);
-    }
-    bintree_iterator parent(){
-        return (node->parent);
-    }
-    bintree_iterator create_lc(const T& v){
-        if(node->has_lchild())return nullptr;
-        return node->insert_as_lchild(v);
-    }
-    bintree_iterator create_rc(const T& v){
-        if(node->has_rchild())return nullptr;
-        return node->insert_as_rchild(v);
-    }
-    bool operator==(bintree_iterator it)const {
-        return node==it.node;
-    }
-    bool  operator!=(bintree_iterator it)const {
-        return node!=it.node;
-    }
-};
-
-template <class T>
-class const_bintree_iterator {
-    using const_bnode_ptr= typename
-    bintree_node<T>::const_bnode_ptr;
-    const_bnode_ptr node;
-    friend class bin_tree<T>;
-public:
-    const_bintree_iterator(const_bnode_ptr node= nullptr){
-        this->node= node;
-    }
-
-    const_bintree_iterator &operator++() {
-        node = node->next();
-        return *this;
-    }
-
-    const_bintree_iterator operator++(int) {
-        auto ret = *this;
-        (*this)++;
-        return ret;
-    }
-
-    const T& operator*  () const{
-        return node->val;
-    }
-
-    T const * operator->() const{
-        return &node->val;
-    }
-    const_bintree_iterator lchild()const {
-        return (node->lc);
-    }
-    const_bintree_iterator rchild()const {
-        return (node->rc);
-    }
-    const_bintree_iterator parent()const{
-        return (node->parent);
-    }
-    bool operator==(const_bintree_iterator it)const {
-        return node==it.node;
-    }
-    bool  operator!=(const_bintree_iterator it)const {
-        return node!=it.node;
     }
 };
 

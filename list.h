@@ -111,6 +111,7 @@ public:
 
     void pop_front() {
         if (head) {
+            if(tail==head)tail= nullptr;
             list_node<T> *tmp = head;
             next_node(head);
             list_node<T>::erase(tmp);
