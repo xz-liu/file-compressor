@@ -8,6 +8,7 @@
 #include <iostream>
 #include <functional>
 #include <bitset>
+#include <sstream>
 #include "huffman.h"
 #include "bin_tree.h"
 
@@ -24,40 +25,49 @@ void pre_order_init(std::istream& in,bintree_node<T>*& root, const T& sepreator)
 }
 
 template <class T>
-void pre_order_init(std::istream& in,bin_tree<T>& new_tree, const T& sepreator){
+void pre_order_init(std::basic_istream<T>& in,bin_tree<T>& new_tree, const T& sepreator){
     pre_order_init(in,new_tree.get_root(),sepreator);
     in.clear();
 }
-using namespace std;
 
 void run_exp3_tests(){
+    using std::cout;
+    using std::endl;
+    using std::bitset;
 
-    {
+    cout<<endl<<"Exp 3 :binary trees"<<endl<<endl;
+    cout<<"Test huffman tree"<<endl;
+
         auto res = huffman<char>("aaaaabbccccdefg");
-        for (auto x:res.counts()) {
-            cout << x.first << ":" << x.second << endl;
-        }
-        cout << endl;
-        for (auto x:res.encoding()) {
-            cout << x.first << ":" <<bitset<8> (x.second) << endl;
-        }
+    cout<<"Original string: "<<res.str()<<endl;
+    cout<<"Char counts"<<endl;
+    for (auto x:res.counts()) {
+        cout << x.first << ":" << x.second << endl;
     }
-    bin_tree<char> int_tree;
-    pre_order_init(cin,int_tree,'#');
+    cout<<"Encoding"<< endl;
+    for (auto x:res.encoding()) {
+        cout << x.first << ":" <<bitset<8> (x.second) << endl;
+    }
+
+    bin_tree<char> char_tree;
+    std::stringstream ss("abc##de#g##f###");
+    cout<<"Test traverse"<<endl;
+    cout<<"Input: "<<ss.str()<<endl;
+    pre_order_init<char>(ss,char_tree,'#');
     auto visit=[](char x){
         cout<<x<<" ";
     };
-    cout<<"pre order :"<<endl;
-    int_tree.trav_pre_order(visit);
+    cout<<"Pre order :"<<endl;
+    char_tree.trav_pre_order(visit);
     cout<<endl;
-    cout<<"in order  :"<<endl;
-    int_tree.trav_in_order(visit);
+    cout<<"In order  :"<<endl;
+    char_tree.trav_in_order(visit);
     cout<<endl;
-    cout<<"post order :"<<endl;
-    int_tree.trav_post_order(visit);
+    cout<<"Post order :"<<endl;
+    char_tree.trav_post_order(visit);
     cout<<endl;
-    cout<<"level      :"<<endl;
-    int_tree.trav_level(visit);
+    cout<<"Level      :"<<endl;
+    char_tree.trav_level(visit);
 };
 
 

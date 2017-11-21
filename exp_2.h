@@ -62,8 +62,9 @@ double get_result(std::string str);
 void run_exp2_tests(){
     using std::cout;
     using std::endl;
+    cout<<endl<<"Exp 2 :stack and queue"<<endl<<endl;
 
-    cout<<"test converting"<<endl;
+    cout<<"Test converting"<<endl;
     vector<uint> dec_nums[]= {
             {4,2,9,4,9,6,7,2,9,6},
             {1,6,0,2},
@@ -89,7 +90,7 @@ void run_exp2_tests(){
         cout<<endl;
     }
 
-    cout<<"test expression checking"<<endl;
+    cout<<"Test expression checking"<<endl;
     std::string test_exp[]={
             "([]){<[]()>}",//true
             "{()",//false
@@ -99,7 +100,7 @@ void run_exp2_tests(){
         cout<<s<<" is "<<(check_expression(s)?"":"not ")<<"a valid expression" <<endl;
     }
 
-    cout<<"test evaluating expressions"<<endl;
+    cout<<"Test evaluating expressions"<<endl;
     std::string expressions[]{
             "sin(5)/4+3",
             "log(3)-(2*PI+e^(1/2))",

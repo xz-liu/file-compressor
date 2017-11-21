@@ -34,7 +34,7 @@ class huffman : public bin_tree<CharT> {
             return node_count > t.node_count;
         }
     };
-
+    std::basic_string<CharT> original_str;
     std::priority_queue<triple, std::vector<triple>, std::greater<triple>> min_heap;
     std::vector<code_pair> codes;
     std::map<CharT, size_t> ref_map;
@@ -51,7 +51,6 @@ class huffman : public bin_tree<CharT> {
     }
 
     void construct(ptr now, bit_ref code) {
-        if (!now)return;
         if (now->is_leaf())
             codes.emplace_back(now->val, code);
         else {
@@ -63,7 +62,8 @@ class huffman : public bin_tree<CharT> {
     }
 
 public:
-    explicit huffman(const std::basic_string<CharT> &str) {
+    explicit huffman(const std::basic_string<CharT> &str):
+            original_str((str)){
         for (auto c:str)ref_map[c]++;
         for (auto p:ref_map)
             min_heap.emplace(p.second, p.first, nullptr);
@@ -89,13 +89,11 @@ public:
         construct(root, 1);
     }
 
-    std::map<CharT, size_t> counts() {
-        return ref_map;
-    }
+    std::map<CharT, size_t> counts() { return ref_map; }
 
-    std::vector<code_pair> encoding() {
-        return codes;
-    }
+    std::vector<code_pair> encoding() { return codes; }
+
+    std::basic_string<CharT> str(){ return original_str;}
 };
 
 

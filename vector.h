@@ -39,8 +39,11 @@ protected:
             impl_end = impl_begin + size;
         }
     }
-
 public:
+    typedef T value_type;
+    typedef T& reference;
+    typedef	const T& const_reference;
+    typedef size_t size_type;
     using iterator=T *;
     using const_iterator=const T *const;
 
@@ -174,7 +177,11 @@ public:
         resize_cap(size, false);
     }
 
-    T &operator[](size_t rank) {
+    T &operator[](size_t rank)  {
+        return impl_begin[rank];
+    }
+
+    const T &operator[](size_t rank) const {
         return impl_begin[rank];
     }
 };

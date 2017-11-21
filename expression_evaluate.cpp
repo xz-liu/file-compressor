@@ -2,16 +2,6 @@
 // Created by joker on 2017/11/5.
 //
 
-int read_optrator(const char *opt);
-
-double read_number(char *&num);
-
-char order_between(int optTop, int optCur);
-
-double evaluate(char *str);
-
-double calculate(double num1, int optr, double num2 = 0.0);
-
 #include "stack.h"
 
 #include <sstream>
@@ -21,6 +11,18 @@ double calculate(double num1, int optr, double num2 = 0.0);
 #include <cstring>
 #include <cstdlib>
 #include <algorithm>
+
+namespace {using namespace std;}
+
+int read_optrator(const char *opt);
+
+double read_number(char *&num);
+
+char order_between(int optTop, int optCur);
+
+double evaluate(char *str);
+
+double calculate(double num1, int optr, double num2 = 0.0);
 
 
 #define OPTR_ADD 0
@@ -62,8 +64,6 @@ static const char pri[optr_count][optr_count] = {
         /*	acos(	*/        '<', '<', '<', '<', '<', '<', '<', 'c', ' ', '<', '<', '<', '<', '<', '<', '<',
         /*	atan(	*/        '<', '<', '<', '<', '<', '<', '<', 'c', ' ', '<', '<', '<', '<', '<', '<', '<',
 };
-
-using namespace std;
 
 const char eval[] = "2.7182818", pival[] = "3.14159265", degree[] = "*0.0174532925";
 
@@ -107,7 +107,6 @@ double get_result(string str) {
     delete[]input;
     return result;
 }
-
 
 int read_optrator(const char *opt) {
     check_out_range(opt);

@@ -177,7 +177,6 @@ struct bintree_node {
 
     void trav_level(visit_func visit){
         queue<bnode_ptr> Q;
-        using namespace std;
         Q.push(this);
         while (!Q.empty()){
             bnode_ptr x=Q.front();

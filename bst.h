@@ -8,7 +8,6 @@
 #include "bin_tree.h"
 #include <functional>
 
-#define _IS_EQUAL(a, b, comp) (!comp(a,b) && !comp(b,a))
 
 template<class T, class Comp=std::less<T>>
 struct bst : bin_tree<T> {
@@ -18,7 +17,9 @@ protected:
     size_t tree_size;
 
     ptr &search_in(ptr rt, const T &val, ptr &hot) {
+#define _IS_EQUAL(a, b, comp) (!comp(a,b) && !comp(b,a))
         if (!rt || _IS_EQUAL(val, rt->val, comp))return rt;
+#undef _IS_EQUAL
         hot = rt;
         return search_in(comp(val, rt->val) ? rt->lc : rt->rc, val, hot);
     }

@@ -7,21 +7,31 @@
 
 #include "list.h"
 #include "vector.h"
+#include "queue.h"
 #include <numeric>
-
+#include <any>
+#include <functional>
 template <class T>
-struct graph_mat:vector<vector<T>>{
+struct graph_mat: public vector<vector<T>>{
     explicit graph_mat(int N)
     :vector<vector<T>>(N,vector<T>(N,0)){}
-    int in_degree(size_t pos)const {
-        return std::accumulate(begin(),end(),0,[&pos](auto a, auto b){
-            return a[pos]+b[pos] ;
-        });
+    graph_mat(const std::initializer_list<::vector<T>>& list)
+            :vector<vector<T>>(list){}
+    using mat=vector<vector<T>>;
+    using iterator = typename mat::iterator;
+    using const_iterator =typename mat::const_iterator;
+
+    T in_degree(size_t pos)const {
+        T val(0);
+        for(auto x=this->begin();x!=this->end();x++){
+            val+=x->operator[](pos);
+        }
+        return val;
     }
-    int out_degree(size_t pos)const {
-        return std::accumulate((*this)[pos].begin(),(*this)[pos].end(),0);
+    T out_degree(size_t pos)const {
+        return std::accumulate((*this)[pos].begin(),(*this)[pos].end(),T(0));
     }
-    int degree(size_t pos)const {
+    T degree(size_t pos)const {
         return in_degree(pos)+out_degree(pos);
     }
 };
@@ -69,6 +79,9 @@ struct graph_list{
     Node&operator[](size_t i){
         return node_vals[i];
     }
+    const Node&operator[](size_t i)const {
+        return node_vals[i];
+    }
 
     int in_degree(size_t pos)const {
         return out[pos].size();
@@ -84,6 +97,34 @@ struct graph_list{
         return edges[out[u][v].edge_ref];
     }
 
+    void dfs(size_t u,std::function<void(Node&)> visit,
+             bool first=true){
+        static ::vector<bool> vis;
+        if(first){
+            vis.resize(node_vals.size());
+            for(auto& x:vis)x= false;
+        }
+        visit(node_vals[u]);vis[u]=true;
+        for(auto x:out[u])if (!vis[x.pos_ref])
+                dfs(x.pos_ref,visit, false);
+    }
+
+    void bfs(size_t u,std::function<void(Node&)> visit){
+        ::vector<bool> vis(node_vals.size(), false);
+        queue<size_t> Q;  Q.push(u);
+        while (!Q.empty()) {
+            size_t front = Q.front();
+            Q.pop();
+            if (!vis[front]) {
+                vis[front] = true;
+                visit(node_vals[front]);
+                for (auto x:out[front]) {
+                    if (!vis[x.pos_ref])
+                        Q.push(x.pos_ref);
+                }
+            }
+        }
+    }
 };
 
 const int inf=0x3f3f3f3f;

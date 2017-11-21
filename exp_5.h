@@ -9,42 +9,62 @@
 #include <functional>
 
 /// binary search O(log(n))
-template<class T, class RandomIt, class Comp>
+template<class T, class RandomIt, class Comp=std::less<T>>
 RandomIt search(RandomIt begin, RandomIt end,
                 const T &value, Comp comp = std::less<T>()) {
     size_t l = 0, r = end - begin;
     while (l < r) {
         size_t mid = (l + r) / 2;
-        if (comp(value, *(begin + mid))) {
-            r = mid;
-        } else {
-            l = mid + 1;
-        }
+        if (comp(value, *(begin + mid))) r = mid;
+        else l = mid + 1;
     }
     return begin + --l;
 }
 
-template<class RandomIt,class Comp>
-void qsort(RandomIt head,RandomIt tail,Comp comp) {
-    if (head == tail) return;
-    RandomIt i = head, j = tail;
-    auto pivot = *head;
-    while (i != j) {
-        while (i != j && comp(pivot, *j))j--;
-        *i = *j;
-        while (i != j && comp(*i, pivot)) i++;
-        *j = *i;
+template <class Iter,class Comp>
+Iter quick_sort_partition(Iter begin,Iter end,Comp comp){
+    auto pivot=*begin;
+    std::iter_swap(begin,end-1);
+    Iter index=begin;
+    for(auto i=begin;i<end-1;i++)
+        if (comp(*i,pivot)){
+            std::iter_swap(i,index);
+            index++;
+        }
+    std::iter_swap(end-1,index);
+    return index;
+};
+
+template <class Iter,class Comp>
+void quicksort(Iter begin, Iter end, Comp comp){
+    if(begin<end){
+        Iter p=quick_sort_partition(begin,end,comp);
+        quicksort(begin, p, comp);
+        quicksort(p + 1, end, comp);
     }
-    *i = pivot;
-    qsort(head, i - 1, comp);
-    qsort(j + 1, tail, comp);
 }
 
 template <class Iter>
-void qsort(Iter first,Iter last){
-    qsort(first,last,std::less<decltype(*first)>());
+void quicksort(Iter first,Iter last){
+    quicksort(first, last,
+    std::less<typename std::remove_reference<decltype(*first)>::type>());
 }
 
+void run_exp5_tests(){
+    using std::cout;
+    using std::endl;
+    std::cout<<"Exp 5 : find and sort"<<endl;
+    vector<int> vec{1,2,43,53,23,4,33,42,432,432,234,23,4,5};
+    cout<<"Vector:"<<endl;
+    output_list(vec);
+    quicksort(vec.begin(),vec.end());
+    cout<<"Sorted"<<endl;
+    output_list(vec);
+    std::sort(vec.begin(),vec.end());
+    cout<<"Position of 5 in sorted vector"<<endl;
+    cout<<std::distance(vec.begin(),search(vec.begin(),vec.end(),5))<<endl;
+
+}
 
 
 #endif //DATA_STRUCTURE_EXP_EXP_5_H
