@@ -12,11 +12,12 @@
 template<class T, class Comp=std::less<T>>
 struct bst : bin_tree<T> {
 protected:
+    using position =typename bin_tree<T>::ptr;
     Comp comp;
-    ptr hot;
-    size_t tree_size;
+    position hot,&root=bin_tree<T>::root;
+    int &tree_size=bin_tree<T>::tree_size;
 
-    ptr &search_in(ptr rt, const T &val, ptr &hot) {
+    position &search_in(position& rt, const T &val, position &hot) {
 #define _IS_EQUAL(a, b, comp) (!comp(a,b) && !comp(b,a))
         if (!rt || _IS_EQUAL(val, rt->val, comp))return rt;
 #undef _IS_EQUAL
@@ -24,23 +25,19 @@ protected:
         return search_in(comp(val, rt->val) ? rt->lc : rt->rc, val, hot);
     }
 
-    ptr &search(const T &val) {
-        return search_in(root, val, hot = nullptr);
-    }
-
-    ptr remove_at(ptr &x, ptr &hot) {
-        ptr del = x, nxt = nullptr;
+    position remove_at(position &x, position &hot) {
+        position del = x, nxt = nullptr;
         if (!x->has_lchild())
-            nxt = x->rc;
+            nxt = x= x->rc;
         else if (!x->has_rchild())
-            nxt = x->lc;
+            nxt = x=x->lc;
         else {
             del = del->next();
             std::swap(x->val, del->val);
-            ptr unc = del->parent;
+            position u = del->parent;
             nxt = del->rc;
-            if (unc == x)unc->rc = nxt;
-            else unc->lc = nxt;
+            if (u == x)u->rc = nxt;
+            else u->lc = nxt;
         }
         hot = del->parent;
         if (nxt)nxt->parent = hot;
@@ -48,25 +45,31 @@ protected:
     }
 
 public:
-    bst() : bin_tree<T>(), tree_size(0) {}
-
-    position find(const T &val) { return search(val); }
+    bst() : bin_tree<T>(){}
+    bst(std::initializer_list<T>&& lst)
+            :bst(){
+        for(auto x:lst){insert(x);}
+    }
+    position &find(const T &val) {
+        return search_in(root, val, hot = nullptr);
+    }
 
     position insert(const T &val) {
-        ptr &x = search(val);
+//        position update;
+        position &x = find(val);
         if (x)return x;
         x = new bintree_node<T>(val, hot);
         tree_size++;
-        update_height_above(x);
+        this->update_height_above(x);
         return x;
     }
 
     bool erase(const T &val) {
-        ptr &x = search(val);
+        position &x = find(val);
         if (!x)return false;
         remove_at(x, hot);
         tree_size--;
-        update_height_above(hot);
+        this->update_height_above(hot);
         return true;
     }
 

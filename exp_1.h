@@ -15,80 +15,59 @@
 #include "vector.h"
 
 
-template <class Seq>
-void output_list(const Seq& list){
-    std::cout<<"Size:"<<list.size()<<" Pos:"<<(&list)<<std::endl;
-    for(const auto& x:list){
-        std::cout<<x<<" ";
+template<class Seq>
+void output_list(const Seq &list) {
+    std::cout << "Size:" << list.size() << " Pos:" << (&list) << std::endl;
+    for (const auto &x:list) {
+        std::cout << x << " ";
     }
-    std::cout<<std::endl;
+    std::cout << std::endl;
 }
 
-
-template <class T,class Comp>
-void merge_list(const list<T> &first, const list<T> &second,list<T>& result,Comp comp){
-    auto iter1=first.begin(),iter2=second.begin();
+template<class T, class Comp=std::less<>>
+void merge_list(const list<T> &first, const list<T> &second,
+                list<T> &result, Comp comp = std::less<>()) {
+    auto iter1 = first.begin(), iter2 = second.begin();
     result.clear();
-    while (iter1!=first.end()&&iter2!=second.end()){
-        if (comp(*iter1,*iter2)){
-            result.push_back(*iter1++);
-        } else{
-            result.push_back(*iter2++);
-        }
+    while (iter1 != first.end() && iter2 != second.end()) {
+        if (comp(*iter1, *iter2))result.push_back(*iter1++);
+        else result.push_back(*iter2++);
     }
-    while (iter1!=first.end()){
-        result.push_back(*iter1++);
-    }
-    while (iter2!=second.end()){
-        result.push_back(*iter2++);
-    }
+    while (iter1 != first.end())result.push_back(*iter1++);
+    while (iter2 != second.end())result.push_back(*iter2++);
 };
 
-template <class T>
-void merge_list(const list<T>& first,const list<T> &second
-        ,list<T>& result) {
-    merge_list(first, second,result, std::less<T>());
-}
 
-template <class T,class Comp>
-void insert_sorted(list<T>& lst,const T& val,Comp comp){
-    auto iter=lst.begin();
-    while (iter!=lst.end()){
-        if(comp(val,*iter)){ break;}
+template<class T, class Comp=std::less<>>
+void insert_sorted(list<T> &lst, const T &val, Comp comp = std::less<>()) {
+    auto iter = lst.begin();
+    while (iter != lst.end()) {
+        if (comp(val, *iter)) { break; }
         iter++;
     }
     iter--;
-    lst.insert(iter,val);
-}
-template <class T>
-void insert_sorted(list<T>& lst,const T& val){
-    insert_sorted(lst,val,std::less<T>());
+    lst.insert(iter, val);
 }
 
 template<class T, class Comp>
-bool in_range(const T &target,  T mink,
+bool in_range(const T &target, T mink,
               T maxk, Comp comp) {
     return comp(mink, target) && comp(target, maxk);
 };
 
-template<class T, class Comp>
-void delete_range(list<T> &lst,
-                  T mink, T maxk,
-                  Comp comp = std::less<T>()) {
-    auto _begin=lst.begin();
-    while (_begin!=lst.end()) {
-        if(in_range(*_begin,mink,maxk,comp)){
-            auto tmp=_begin;
+template<class T, class Comp=std::less<>>
+void delete_range(list<T> &lst, T mink, T maxk,
+                  Comp comp = std::less<>()) {
+    auto _begin = lst.begin();
+    while (_begin != lst.end()) {
+        if (in_range(*_begin, mink, maxk, comp)) {
+            auto tmp = _begin;
             _begin++;
             lst.erase(tmp);
-        } else{
+        } else {
             _begin++;
         }
     }
-}
-template <class T>
-void delete_range(list<T> &lst,T mink,T maxk){
-    delete_range(lst,mink,maxk,std::less<T>());
 }
 
 template<class BidirIt>
@@ -98,54 +77,54 @@ void reverse(BidirIt first, BidirIt last) {
     }
 }
 
-void run_exp1_tests(){
+void run_exp1_tests() {
     using std::cout;
     using std::endl;
-    cout<<"Exp 1 :vector and list"<<endl<<endl;
-    cout<<"Test list"<<endl;
-    list<int> listInt{1,2,3,4,5,6,7,8,9,10};
+    cout << "Exp 1 :vector and list" << endl << endl;
+    cout << "Test list" << endl;
+    list<int> listInt{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     output_list(listInt);
-    cout<<"Erase 5"<<endl;
+    cout << "Erase 5" << endl;
     listInt.erase(listInt.find(5));
     output_list(listInt);
-    cout<<"Insert 5 after 4"<<endl;
-    listInt.insert(listInt.find(4),5);
+    cout << "Insert 5 after 4" << endl;
+    listInt.insert(listInt.find(4), 5);
     output_list(listInt);
-    cout<<"Push back 11"<<endl;
+    cout << "Push back 11" << endl;
     listInt.push_back(11);
     output_list(listInt);
-    cout<<"Push front 0"<<endl;
+    cout << "Push front 0" << endl;
     listInt.push_front(0);
     output_list(listInt);
-    cout<<"Reverse list"<<endl;
-    reverse(listInt.begin(),listInt.end());
+    cout << "Reverse list" << endl;
+    reverse(listInt.begin(), listInt.end());
     output_list(listInt);
-    cout<<"Delete range(3,10)"<<endl;
-    delete_range(listInt,3,10);
+    cout << "Delete range(3,10)" << endl;
+    delete_range(listInt, 3, 10);
     output_list(listInt);
-    cout<<"Reverse list"<<endl;
-    reverse(listInt.begin(),listInt.end());
+    cout << "Reverse list" << endl;
+    reverse(listInt.begin(), listInt.end());
     output_list(listInt);
-    list<int> toMerge{5,6,7}, mergeResult;
-    cout<<"Merge with ";
+    list<int> toMerge{5, 6, 7}, mergeResult;
+    cout << "Merge with ";
 //    output_list(mergeResult);
     output_list(toMerge);
-    merge_list(listInt,toMerge,mergeResult);
+    merge_list(listInt, toMerge, mergeResult);
     output_list(mergeResult);
-    cout<<"Insert 5 in sorted list"<<endl;
-    insert_sorted(mergeResult,5);
+    cout << "Insert 5 in sorted list" << endl;
+    insert_sorted(mergeResult, 5);
     output_list(mergeResult);
-    cout<<"Test vector"<<endl;
-    vector<int> vec{1,2,3,4,5};
+    cout << "Test vector" << endl;
+    vector<int> vec{1, 2, 3, 4, 5};
     output_list(vec);
-    cout<<"Push back 6"<<endl;
+    cout << "Push back 6" << endl;
     vec.push_back(6);
-    cout<<"Push back 7"<<endl;
+    cout << "Push back 7" << endl;
     vec.push_back(7);
     output_list(vec);
-    cout<<"Pop back"<<endl;
+    cout << "Pop back" << endl;
     vec.pop_back();
-    cout<<"vec[0] is "<<vec[0]<<endl;
+    cout << "vec[0] is " << vec[0] << endl;
     output_list(vec);
 }
 

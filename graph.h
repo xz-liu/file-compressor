@@ -109,40 +109,35 @@ struct graph_list{
                 dfs(x.pos_ref,visit, false);
     }
 
-    void bfs(size_t u,std::function<void(Node&)> visit){
+    void bfs(size_t u,std::function<void(Node&)> visit) {
         ::vector<bool> vis(node_vals.size(), false);
-        queue<size_t> Q;  Q.push(u);
+        queue<size_t> Q;Q.push(u);
         while (!Q.empty()) {
             size_t front = Q.front();
             Q.pop();
             if (!vis[front]) {
                 vis[front] = true;
                 visit(node_vals[front]);
-                for (auto x:out[front]) {
-                    if (!vis[x.pos_ref])
-                        Q.push(x.pos_ref);
-                }
+                for (auto x:out[front])
+                    Q.push(x.pos_ref);
             }
         }
     }
 };
 
 const int inf=0x3f3f3f3f;
-void dijkstra(const graph_mat<int> &G,size_t v,vector<int> &res){
-    size_t n;res.resize(n=G.size());
-    vector<bool> vis(n, false);
-    for (int i = 0; i <n ; ++i) {
-        res[i]=(i?inf:0);
-    }
+void dijkstra(const graph_mat<int> &G,size_t v,vector<int> &res) {
+    size_t n;
+    res.resize(n = G.size());
+    ::vector<bool> vis(n, false);
+    for (int i = 0; i < n; ++i) res[i] = (i ? inf : 0);
     for (int i = 0; i < n; ++i) {
-        int x,m=inf;
-        for (int y = 0; y < n; ++y) {
-            if(!vis[y]&&res[y]<=m)m=res[x=y];
-        }
-        vis[x]=true;
-        for (int y = 0; y < n; ++y) {
-            res[y]=std::min(res[y],res[x]+G[x][y]);
-        }
+        int x, m = inf;
+        for (int y = 0; y < n; ++y)
+            if (!vis[y] && res[y] <= m)m = res[x = y];
+        vis[x] = true;
+        for (int y = 0; y < n; ++y)
+            res[y] = std::min(res[y], res[x] + G[x][y]);
     }
 }
 

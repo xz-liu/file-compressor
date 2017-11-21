@@ -35,7 +35,7 @@ class huffman : public bin_tree<CharT> {
         }
     };
     std::basic_string<CharT> original_str;
-    std::priority_queue<triple, std::vector<triple>, std::greater<triple>> min_heap;
+    std::priority_queue<triple, std::vector<triple>, std::greater<>> min_heap;
     std::vector<code_pair> codes;
     std::map<CharT, size_t> ref_map;
     ptr &root = bin_tree<CharT>::root;

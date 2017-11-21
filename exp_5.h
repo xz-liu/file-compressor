@@ -9,9 +9,9 @@
 #include <functional>
 
 /// binary search O(log(n))
-template<class T, class RandomIt, class Comp=std::less<T>>
+template<class T, class RandomIt, class Comp=std::less<>>
 RandomIt search(RandomIt begin, RandomIt end,
-                const T &value, Comp comp = std::less<T>()) {
+                const T &value, Comp comp = std::less<>()) {
     size_t l = 0, r = end - begin;
     while (l < r) {
         size_t mid = (l + r) / 2;
@@ -35,35 +35,31 @@ Iter quick_sort_partition(Iter begin,Iter end,Comp comp){
     return index;
 };
 
-template <class Iter,class Comp>
-void quicksort(Iter begin, Iter end, Comp comp){
+template <class Iter,class Comp=std::less<>>
+void quick_sort(Iter begin, Iter end, Comp comp=std::less<>()){
     if(begin<end){
         Iter p=quick_sort_partition(begin,end,comp);
-        quicksort(begin, p, comp);
-        quicksort(p + 1, end, comp);
+        quick_sort(begin, p, comp);
+        quick_sort(p + 1, end, comp);
     }
 }
 
-template <class Iter>
-void quicksort(Iter first,Iter last){
-    quicksort(first, last,
-    std::less<typename std::remove_reference<decltype(*first)>::type>());
-}
 
 void run_exp5_tests(){
     using std::cout;
     using std::endl;
-    std::cout<<"Exp 5 : find and sort"<<endl;
+    std::cout<<"Exp 5 : find and sort"<<endl<<endl;
+    cout<<"Test sort(quick-sort)"<<endl;
     vector<int> vec{1,2,43,53,23,4,33,42,432,432,234,23,4,5};
     cout<<"Vector:"<<endl;
     output_list(vec);
-    quicksort(vec.begin(),vec.end());
+    quick_sort(vec.begin(), vec.end());
     cout<<"Sorted"<<endl;
     output_list(vec);
-    std::sort(vec.begin(),vec.end());
-    cout<<"Position of 5 in sorted vector"<<endl;
-    cout<<std::distance(vec.begin(),search(vec.begin(),vec.end(),5))<<endl;
-
+//    std::sort(vec.begin(),vec.end());
+    cout<<"Test binary search"<<endl;
+    cout<<"Position of 5 in sorted vector: ";
+    cout<<(std::distance(vec.begin(),search(vec.begin(),vec.end(),5))+1)<<endl;
 }
 
 

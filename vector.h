@@ -187,5 +187,4 @@ public:
 };
 
 
-
 #endif //DATA_STRUCTURE_EXP_VECTOR_H
