@@ -1,3 +1,7 @@
+
+static_assert(__cplusplus>201400,
+  "This program needs C++14 or higher version of C++");
+
 #include "exp_1.h"
 #include "exp_2.h"
 #include "exp_3.h"
@@ -10,7 +14,9 @@ int main() {
     run_exp3_tests();
     run_exp4_tests();
     run_exp5_tests();
+
     std::cin.get();
+
     return 0;
 }
 

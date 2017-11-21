@@ -7,7 +7,6 @@
 #include <sstream>
 #include <string>
 #include <cmath>
-#include <cctype>
 #include <cstring>
 #include <cstdlib>
 #include <algorithm>
@@ -15,15 +14,10 @@
 namespace {using namespace std;}
 
 int read_optrator(const char *opt);
-
 double read_number(char *&num);
-
 char order_between(int optTop, int optCur);
-
 double evaluate(char *str);
-
 double calculate(double num1, int optr, double num2 = 0.0);
-
 
 #define OPTR_ADD 0
 #define OPTR_MIN 1
@@ -151,7 +145,6 @@ int read_optrator(const char *opt) {
             return OPTR_LOG;
     }
     throw exception();
-    return OPTR_ERR;
 }
 
 double read_number(char *&num) {
