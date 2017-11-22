@@ -47,6 +47,20 @@ protected:
         delete x;return n;
     }
 
+    template <class CharT>
+    void pre_order_init(std::basic_istream<CharT> &in,
+                        typename bintree_node<T>::bnode_ptr &now,
+                        typename bintree_node<T>::bnode_ptr parent,
+                        int& size,const T &sepreator) {
+        T x;if (!(in >> x)) return;
+        if (x == sepreator)
+        { now = nullptr;return; }
+        size++;now = (new bintree_node<T>(x,parent));
+        pre_order_init(in, now->lc,now,size, sepreator);
+        pre_order_init(in, now->rc,now,size,sepreator);
+
+    }
+
 public:
     using visit_func=typename node::visit_func;
     using const_visit_func=typename node::const_visit_func;
@@ -55,6 +69,14 @@ public:
 
     bin_tree():tree_size(0),root(nullptr){}
     virtual ~bin_tree(){clear();}
+
+    template <class CharT=char>
+    void pre_order_init(std::basic_istream<CharT> &in,const T &sepreator){
+        this->clear();
+        pre_order_init(in,root, nullptr,tree_size,sepreator);
+        in.clear();
+    }
+
 
     static void remove_subtree(bin_tree* tree,position iter){
         if (!iter)return;
@@ -92,6 +114,8 @@ void trav_##type_name(const_visit_func vis)const\
 
     position& get_root(){ return root; }
     const_position get_root()const { return root;}
+
+
 
 };
 

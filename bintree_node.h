@@ -28,73 +28,41 @@ struct bintree_node {
     }
 
     bintree_node()
-            : parent(nullptr), lc(nullptr), rc(nullptr),
-              node_height(0), npl(1){}
+    : parent(nullptr), lc(nullptr), rc(nullptr), node_height(0), npl(1){}
 
     explicit bintree_node(const T &val, bnode_ptr parent = nullptr,
-                 bnode_ptr lchild = nullptr, bnode_ptr rchild = nullptr,
-                 int height = 0, int null_path_length = 1)
-            : val(val), parent(parent), lc(lchild), rc(rchild), node_height(height),
-              npl(null_path_length) {}
+                bnode_ptr lchild = nullptr, bnode_ptr rchild = nullptr,
+                int height = 0, int null_path_length = 1)
+    : val(val), parent(parent), lc(lchild), rc(rchild), node_height(height),
+      npl(null_path_length) {}
 
-    static void move_to_lc(bnode_ptr &ptr) {
-        ptr = ptr->lc;
-    }
+    static void move_to_lc(bnode_ptr &ptr) { ptr = ptr->lc; }
 
-    static void move_to_rc(bnode_ptr &ptr) {
-        ptr = ptr->rc;
-    }
+    static void move_to_rc(bnode_ptr &ptr) { ptr = ptr->rc; }
 
-    static void move_to_parent(bnode_ptr &ptr) {
-        ptr = ptr->parent;
-    }
+    static void move_to_parent(bnode_ptr &ptr) { ptr = ptr->parent; }
 
-    bool has_parent() const {
-        if(!this)return true;
-        return (bool) parent;
-    }
+    bool has_parent() const { if(!this)return true;return (bool) parent; }
 
-    bool is_root()const {
-        return !has_parent();
-    }
+    bool is_root()const { return !has_parent(); }
 
-    bool is_lchild() const{
-        return !is_root() && (this == parent->lc);
-    }
+    bool is_lchild() const{ return !is_root() && (this == parent->lc); }
 
-    bool is_rchild() const{
-        return !is_root() && (this == parent->rc);
-    }
+    bool is_rchild() const{ return !is_root() && (this == parent->rc); }
 
-    bool has_lchild() const{
-        return (bool) lc;
-    }
+    bool has_lchild() const{ return (bool) lc; }
 
-    bool has_rchild() const{
-        return (bool) rc;
-    }
+    bool has_rchild() const{ return (bool) rc; }
 
-    bool has_child() const{
-        return has_lchild() || has_rchild();
-    }
+    bool has_child() const{ return has_lchild() || has_rchild(); }
 
-    bool has_all_children() const{
-        return has_rchild() && has_rchild();
-    }
+    bool has_all_children() const{ return has_rchild() && has_rchild(); }
 
-    bool is_leaf() const{
-        return !(this&&has_child());
-    }
+    bool is_leaf() const{ return !(this&&has_child()); }
 
-    bnode_ptr& sibling() {
-        return is_lchild() ? parent->rc : parent->lc;
-    }
+    bnode_ptr& sibling() { return is_lchild() ? parent->rc : parent->lc; }
 
-    bnode_ptr& uncle() {
-        return parent->is_lchild() ?
-               parent->parent->rc :
-               parent->parent->lc;
-    }
+    bnode_ptr& uncle() {return parent->is_lchild() ? parent->parent->rc : parent->parent->lc; }
 
     void set_parent_ref(bnode_ptr ptr){
         if (!this)return;
@@ -121,89 +89,46 @@ struct bintree_node {
         }
         return s;
     }
-    const_bnode_ptr& next()const{
-        return (const_cast<bnode_ptr >(this))->next();
-    }
 
-    bnode_ptr& insert_as_lchild(T const &val) {
-        return lc = new bintree_node(val, this);
-    }
+    const_bnode_ptr& next()const{ return (const_cast<bnode_ptr >(this))->next(); }
 
-    bnode_ptr& insert_as_rchild(T const &val) {
-        return rc = new bintree_node(val, this);
-    }
+    bnode_ptr& insert_as_lchild(T const &val) { return lc = new bintree_node(val, this); }
 
-    void trav_in_order(visit_func visit) {
-        if (!this)return;
-        lc->trav_in_order(visit);
-        visit(val);
-        rc->trav_in_order(visit);
-    }
+    bnode_ptr& insert_as_rchild(T const &val) { return rc = new bintree_node(val, this); }
 
-    void trav_in_order(const_visit_func visit) const {
-        if (!this)return;
-        lc->trav_in_order(visit);
-        visit(val);
-        rc->trav_in_order(visit);
-    }
+    bool operator<(bintree_node const &bn) const { return val < bn.val; }
 
-    void trav_pre_order(visit_func visit) {
-        if (!this)return;
-        visit(val);
-        lc->trav_pre_order(visit);
-        rc->trav_pre_order(visit);
-    }
+    bool operator==(bintree_node const &bn) const { return val == bn.val; }
 
-    void trav_pre_order(const_visit_func visit) const {
-        if (!this)return;
-        visit(val);
-        lc->trav_pre_order(visit);
-        rc->trav_pre_order(visit);
+#define _base if (!this)return;
+#define _bintree_node_trav_(trav_type,body)\
+    void trav_##trav_type##_order(visit_func visit) {_base body } \
+    void trav_##trav_type##_order(const_visit_func visit) const {_base body}
+#define _to_ch(child_type,trav_type) \
+    child_type->trav_##trav_type##_order(visit);
+#define _vis visit(val);
+    _bintree_node_trav_(in, _to_ch(lc,in) _vis _to_ch(rc,in))
+    _bintree_node_trav_(pre, _vis _to_ch(lc,pre)_to_ch(rc,pre))
+    _bintree_node_trav_(post, _to_ch(lc,post)_to_ch(rc,post)_vis)
+#undef _bintree_node_trav_
+#define const_ const
+#define _bintree_node_trav_level(is_const)\
+    void trav_level(is_const##visit_func visit) is_const{\
+        queue<is_const##bnode_ptr> Q;Q.push(this);\
+        while (!Q.empty()){\
+            is_const##bnode_ptr x=Q.front();\
+            Q.pop();visit(x->val);\
+            if(x->has_lchild()){ Q.push(x->lc); }\
+            if(x->has_rchild()){ Q.push(x->rc); }\
+        }\
     }
-
-    void trav_post_order(visit_func visit) {
-        if (!this)return;
-        lc->trav_post_order(visit);
-        rc->trav_post_order(visit);
-        visit(val);
-    }
-
-    void trav_post_order(const_visit_func visit) const {
-        if (!this)return;
-        lc->trav_post_order(visit);
-        rc->trav_post_order(visit);
-        visit(val);
-    }
-
-    void trav_level(visit_func visit){
-        queue<bnode_ptr> Q;
-        Q.push(this);
-        while (!Q.empty()){
-            bnode_ptr x=Q.front();
-            Q.pop();visit(x->val);
-            if(x->has_lchild()){ Q.push(x->lc); }
-            if(x->has_rchild()){ Q.push(x->rc); }
-        }
-    }
-
-    void trav_level(const_visit_func visit)const {
-        queue<const_bnode_ptr> Q;
-        Q.push(this);
-        while (!Q.empty()) {
-            const_bnode_ptr x = Q.front();
-            Q.pop();visit(x->val);
-            if (x->has_lchild()) { Q.push(x->lc); }
-            if (x->has_rchild()) { Q.push(x->rc); }
-        }
-    }
-
-    bool operator<(bintree_node const &bn) const {
-        return val < bn.val;
-    }
-
-    bool operator==(bintree_node const &bn) const {
-        return val == bn.val;
-    }
+    _bintree_node_trav_level()
+    _bintree_node_trav_level(const_)
+#undef _bintree_node_trav_level
+#undef _to_ch
+#undef const_
+#undef _vis
+#undef _base
 };
 
 #endif //DATA_STRUCTURE_EXP_BINTREE_NODE_H

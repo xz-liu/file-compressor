@@ -29,10 +29,9 @@ void merge_list(const list<T> &first, const list<T> &second,
                 list<T> &result, Comp comp = std::less<>()) {
     auto iter1 = first.begin(), iter2 = second.begin();
     result.clear();
-    while (iter1 != first.end() && iter2 != second.end()) {
+    while (iter1 != first.end() && iter2 != second.end())
         if (comp(*iter1, *iter2))result.push_back(*iter1++);
         else result.push_back(*iter2++);
-    }
     while (iter1 != first.end())result.push_back(*iter1++);
     while (iter2 != second.end())result.push_back(*iter2++);
 };
@@ -42,7 +41,7 @@ template<class T, class Comp=std::less<>>
 void insert_sorted(list<T> &lst, const T &val, Comp comp = std::less<>()) {
     auto iter = lst.begin();
     while (iter != lst.end()) {
-        if (comp(val, *iter)) { break; }
+        if (comp(val, *iter)) break;
         iter++;
     }
     iter--;
@@ -64,17 +63,14 @@ void delete_range(list<T> &lst, T mink, T maxk,
             auto tmp = _begin;
             _begin++;
             lst.erase(tmp);
-        } else {
-            _begin++;
-        }
+        } else _begin++;
     }
 }
 
 template<class BidirIt>
 void reverse(BidirIt first, BidirIt last) {
-    while ((first != last) && (first != --last)) {
-        std::swap(*first++, *last);
-    }
+    while ((first != last) && (first != --last))
+        std::iter_swap(first++, last);
 }
 
 void run_exp1_tests() {
@@ -107,7 +103,6 @@ void run_exp1_tests() {
     output_list(listInt);
     list<int> toMerge{5, 6, 7}, mergeResult;
     cout << "Merge with ";
-//    output_list(mergeResult);
     output_list(toMerge);
     merge_list(listInt, toMerge, mergeResult);
     output_list(mergeResult);

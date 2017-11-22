@@ -55,7 +55,6 @@ public:
     }
 
     position insert(const T &val) {
-//        position update;
         position &x = find(val);
         if (x)return x;
         x = new bintree_node<T>(val, hot);
@@ -72,6 +71,11 @@ public:
         this->update_height_above(hot);
         return true;
     }
+
+    void for_each(typename bin_tree<T>::visit_func func)
+    {this->trav_in_order(func);}
+    void for_each(typename bin_tree<T>::const_visit_func func)const
+    { this->trav_in_order(func);}
 
 };
 

@@ -11,7 +11,7 @@
 /// binary search O(log(n))
 template<class T, class RandomIt, class Comp=std::less<>>
 RandomIt search(RandomIt begin, RandomIt end,
-                const T &value, Comp comp = std::less<>()) {
+        const T &value, Comp comp = std::less<>()) {
     size_t l = 0, r = end - begin;
     while (l < r) {
         size_t mid = (l + r) / 2;
@@ -22,18 +22,15 @@ RandomIt search(RandomIt begin, RandomIt end,
 }
 
 template <class Iter,class Comp>
-Iter quick_sort_partition(Iter begin,Iter end,Comp comp){
-    auto pivot=*begin;
-    std::iter_swap(begin,end-1);
-    Iter index=begin;
-    for(auto i=begin;i<end-1;i++)
-        if (comp(*i,pivot)){
-            std::iter_swap(i,index);
-            index++;
-        }
-    std::iter_swap(end-1,index);
+Iter quick_sort_partition(Iter begin,Iter end,Comp comp) {
+    auto pivot = *begin;auto &&right=end-1;
+    std::iter_swap(begin, right);
+    Iter index = begin;
+    for (auto i = begin; i != right; i++)
+        if (comp(*i, pivot))std::iter_swap(i, index++);
+    std::iter_swap(right, index);
     return index;
-};
+}
 
 template <class Iter,class Comp=std::less<>>
 void quick_sort(Iter begin, Iter end, Comp comp=std::less<>()){
@@ -44,11 +41,10 @@ void quick_sort(Iter begin, Iter end, Comp comp=std::less<>()){
     }
 }
 
-
 void run_exp5_tests(){
     using std::cout;
     using std::endl;
-    std::cout<<"Exp 5 : find and sort"<<endl<<endl;
+    cout<<"Exp 5 : find and sort"<<endl<<endl;
     cout<<"Test sort(quick-sort)"<<endl;
     vector<int> vec{1,2,43,53,23,4,33,42,432,432,234,23,4,5};
     cout<<"Vector:"<<endl;
@@ -56,7 +52,6 @@ void run_exp5_tests(){
     quick_sort(vec.begin(), vec.end());
     cout<<"Sorted"<<endl;
     output_list(vec);
-//    std::sort(vec.begin(),vec.end());
     cout<<"Test binary search"<<endl;
     cout<<"Position of 5 in sorted vector: ";
     cout<<(std::distance(vec.begin(),search(vec.begin(),vec.end(),5))+1)<<endl;

@@ -76,14 +76,15 @@ void run_exp4_tests() {
     for (int i = 0; i < 10; ++i) {
         graphList[i] = i;
     }
+
     for (auto x:add) {
         cout << "add edge u=" << x[0] << " v=" << x[1] << " w=" << x[2] << endl;
         graphList.add_edge(x[0], x[1], x[2]);
     }
     cout << "BFS" << endl;
-    graphList.bfs(0, [&](auto a) { cout << a << " "; });
+    graphList.bfs(0, [&](auto a) { std::cout << a << " "; });
     cout << endl << "DFS" << endl;
-    graphList.dfs(0, [&](auto a) { cout << a << " "; });
+    graphList.dfs(0, [&](auto a) { std::cout << a << " "; });
     cout << endl;
 
 }

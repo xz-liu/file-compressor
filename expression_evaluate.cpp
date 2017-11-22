@@ -1,6 +1,7 @@
 //
 // Created by joker on 2017/11/5.
 //
+#pragma warning(disable:4996)
 
 #include "stack.h"
 

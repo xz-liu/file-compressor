@@ -13,8 +13,6 @@
 
 using uint=unsigned int;
 
-#define until(x) while(!(x))
-
 void convert(const vector<uint> &input, uint input_base,
              vector<uint> &output, uint output_base) {
     output.clear();
@@ -28,7 +26,7 @@ void convert(const vector<uint> &input, uint input_base,
         mid.push(val%output_base);
         val/=output_base;
     }
-    until(mid.empty()){
+    while (!mid.empty()){
         output.push_back(mid.top());
         mid.pop();
     }
@@ -42,13 +40,13 @@ bool check_expression(const std::string& exp) {
                  != std::string::npos)
             brackets.push(c);
         else if (c == [&](){
-                 switch (brackets.top()) {
-                     case '(':return ')';
-                     case '[':return ']';
-                     case '{':return '}';
-                     case '<':return '>';
-                     default:return brackets.top();
-                 }}()) {
+             switch (brackets.top()) {
+                 case '(':return ')';
+                 case '[':return ']';
+                 case '{':return '}';
+                 case '<':return '>';
+                 default:return brackets.top();
+             }}()) {
             brackets.pop();
         } else {
             return false;
