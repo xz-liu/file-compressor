@@ -101,17 +101,21 @@ struct bintree_node {
     bool operator==(bintree_node const &bn) const { return val == bn.val; }
 
 #define _base if (!this)return;
+#define _vis visit(val);
+#define _to_ch(child_type,trav_type) \
+    child_type->trav_##trav_type##_order(visit);
+
 #define _bintree_node_trav_(trav_type,body)\
     void trav_##trav_type##_order(visit_func visit) {_base body } \
     void trav_##trav_type##_order(const_visit_func visit) const {_base body}
-#define _to_ch(child_type,trav_type) \
-    child_type->trav_##trav_type##_order(visit);
-#define _vis visit(val);
+
     _bintree_node_trav_(in, _to_ch(lc,in) _vis _to_ch(rc,in))
     _bintree_node_trav_(pre, _vis _to_ch(lc,pre)_to_ch(rc,pre))
     _bintree_node_trav_(post, _to_ch(lc,post)_to_ch(rc,post)_vis)
+
 #undef _bintree_node_trav_
 #define const_ const
+
 #define _bintree_node_trav_level(is_const)\
     void trav_level(is_const##visit_func visit) is_const{\
         queue<is_const##bnode_ptr> Q;Q.push(this);\
@@ -122,8 +126,10 @@ struct bintree_node {
             if(x->has_rchild()){ Q.push(x->rc); }\
         }\
     }
+
     _bintree_node_trav_level()
     _bintree_node_trav_level(const_)
+
 #undef _bintree_node_trav_level
 #undef _to_ch
 #undef const_
