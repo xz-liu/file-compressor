@@ -114,25 +114,22 @@ struct bintree_node {
     _bintree_node_trav_(post, _to_ch(lc,post)_to_ch(rc,post)_vis)
 
 #undef _bintree_node_trav_
-#define const_ const
-
-#define _bintree_node_trav_level(is_const)\
-    void trav_level(is_const##visit_func visit) is_const{\
-        queue<is_const##bnode_ptr> Q;Q.push(this);\
+#define _bintree_node_trav_level(prefix,attr)\
+    void trav_level(prefix##visit_func visit) attr{\
+        queue<prefix##bnode_ptr> Q;Q.push(this);\
         while (!Q.empty()){\
-            is_const##bnode_ptr x=Q.front();\
+            prefix##bnode_ptr x=Q.front();\
             Q.pop();visit(x->val);\
             if(x->has_lchild()){ Q.push(x->lc); }\
             if(x->has_rchild()){ Q.push(x->rc); }\
         }\
     }
 
-    _bintree_node_trav_level()
-    _bintree_node_trav_level(const_)
+    _bintree_node_trav_level(,)
+    _bintree_node_trav_level(const_, const)
 
 #undef _bintree_node_trav_level
 #undef _to_ch
-#undef const_
 #undef _vis
 #undef _base
 };

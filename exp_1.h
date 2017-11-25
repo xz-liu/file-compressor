@@ -73,6 +73,18 @@ void reverse(BidirIt first, BidirIt last) {
         std::iter_swap(first++, last);
 }
 
+template <class T>
+auto reverse_linked_list(list_node<T>* head){
+    decltype(head) prev= nullptr,curr=head;
+    while (curr){
+        auto nxt=curr->next;
+        curr->next=prev;
+        prev=curr;
+        curr=nxt;
+    }
+    return prev;
+}
+
 void run_exp1_tests() {
     using std::cout;
     using std::endl;

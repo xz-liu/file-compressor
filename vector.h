@@ -177,6 +177,20 @@ public:
         resize_cap(size, false);
     }
 
+    void reserve(size_t new_size){
+        if (cap<new_size){
+            resize_cap(new_size, true);
+        }
+    }
+    template <class ...Args>
+    void emplace(Args&&... args){
+        if (size() >= cap)resize_cap(size());
+        new (impl_end++) T(std::forward<Args>(args)...);
+    }
+
+    template <class ...Args>
+    void emplace_back(Args&&... args){emplace(args...);}
+
     T &operator[](size_t rank)  {
         return impl_begin[rank];
     }

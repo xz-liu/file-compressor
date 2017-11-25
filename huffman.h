@@ -5,14 +5,12 @@
 #ifndef DATA_STRUCTURE_EXP_HUFFMAN_H
 #define DATA_STRUCTURE_EXP_HUFFMAN_H
 
-#include <queue>
-#include <vector>
 #include <functional>
-#include <algorithm>
 #include <utility>
 #include <string>
 #include <map>
 #include "bin_tree.h"
+
 
 template<class CharT>
 class huffman : public bin_tree<CharT> {
@@ -29,13 +27,13 @@ class huffman : public bin_tree<CharT> {
 
         triple(size_t c, CharT ch, ptr p)
                 : node_count(c), node_char(ch), node_ptr(p) {}
-
+        triple(){}
         bool operator>(const triple &t) const {
             return node_count > t.node_count;
         }
     };
     std::basic_string<CharT> original_str;
-    std::priority_queue<triple, std::vector<triple>, std::greater<>> min_heap;
+    priority_queue<triple, vector<triple>, std::greater<>> min_heap;
     std::vector<code_pair> codes;
     std::map<CharT, size_t> ref_map;
     ptr &root = bin_tree<CharT>::root;
