@@ -11,8 +11,7 @@
 #include <cstdlib>
 
 template<class T>
-class deque : public list<T> {
-};
+class deque : public list<T> {};
 
 template<class T>
 class queue : private list<T> {
@@ -33,24 +32,24 @@ public:
         return list<T>::empty();
     }
 
-    T &front() {
+    const T &front() {
         return list<T>::front();
     }
+
 };
 
-template<class T, class Container=vector<T>, class Comp=std::less<>>
-class priority_queue {
+template<class T, class Seq=vector<T>, class Comp=std::less<>>
+class priority_queue{
 public:
-    using container_type=Container;
+    using container_type=Seq;
     using value_compare=Comp;
-    using value_type=typename Container::value_type;
-    using size_type=typename Container::size_type;
-    using reference=typename Container::reference;
-    using const_reference=typename Container::const_reference;
+    using value_type=typename Seq::value_type;
+    using size_type=typename Seq::size_type;
+    using reference=typename Seq::reference;
+    using const_reference=typename Seq::const_reference;
 protected:
-    Container container;
+    Seq container;
     Comp comp;
-
     bool exists(size_type rank)
     { return rank < container.size(); }
 
@@ -58,8 +57,7 @@ protected:
     { return comp(container[ra], container[rb]); }
 
     void rank_swap(size_type a, size_type b) {
-        std::iter_swap
-        (container.begin() + a, container.begin() + b);
+        std::iter_swap(container.begin() + a, container.begin() + b);
     }
 
     void heap_up(size_type rank) {
@@ -89,10 +87,10 @@ protected:
         container.pop_back();
         heap_down(index);
     }
-
 public:
-    explicit priority_queue(Comp compare = Comp())
-            : comp(compare) {}
+    explicit
+    priority_queue(Comp const& comp=Comp(),Seq const& seq=Seq())
+    : comp(comp),container(seq){}
 
     size_type size() { return container.size(); }
 

@@ -24,20 +24,16 @@ protected:
         size_t pre = cap;
         while (cap <= size)cap <<= 1;
         if (pre < cap) {
-            iterator new_place = new T[cap],
-                    itpre = begin(), it = new_place;
+            iterator new_place = new T[cap];
+            iterator itpre = begin(), it = new_place;
             if (reserve) {
-                while (itpre != end()) {
-                    new(it++)T(*itpre++);
-                }
+                while (itpre != end())new(it++)T(*itpre++);
                 impl_end = it;
             }
             delete[]impl_begin;
             impl_begin = new_place;
             if (!reserve)impl_end = impl_begin;
-        } else {
-            impl_end = impl_begin + size;
-        }
+        } else impl_end = impl_begin + size;
     }
 public:
     typedef T value_type;
@@ -65,9 +61,7 @@ public:
 
     virtual bool empty() { return !size(); }
 
-    vector() {
-        init_cap(0);
-    }
+    vector() { init_cap(0); }
 
     vector(std::initializer_list<T> init_list)
             : vector() {
@@ -107,9 +101,7 @@ public:
         }
     }
 
-    virtual ~vector() {
-        delete[]impl_begin;
-    }
+    virtual ~vector() { delete[]impl_begin; }
 
     void clear() {
         delete[]impl_begin;
@@ -121,19 +113,12 @@ public:
         new(impl_end++) T(value);
     }
 
-    void pop_back() {
-        if (size()) {
-            impl_end--;
-        }
-    }
+    void pop_back() { if (size()) impl_end--; }
 
-    void push_front(const T &value) {
-        insert(begin(), value);
-    }
+    void push_front(const T &value)
+    { insert(begin(), value); }
 
-    void pop_front() {
-        erase(begin());
-    }
+    void pop_front() { erase(begin()); }
 
     void erase(iterator iter) {
         if (size()) {
@@ -148,17 +133,11 @@ public:
         }
     }
 
-    void erase(size_t pos) {
-        erase(begin() + pos);
-    }
+    void erase(size_t pos) { erase(begin() + pos); }
 
-    T& back(){
-        return impl_end[-1];
-    }
+    T& back(){ return impl_end[-1]; }
 
-    T& front(){
-        return *impl_begin;
-    }
+    T& front(){ return *impl_begin; }
 
     void insert(iterator iter, const T &value) {
         resize_cap(size());
@@ -175,13 +154,11 @@ public:
 
     void resize(size_t size) {
         resize_cap(size, false);
+        impl_end=impl_begin+size;
     }
 
-    void reserve(size_t new_size){
-        if (cap<new_size){
-            resize_cap(new_size, true);
-        }
-    }
+    void reserve(size_t new_size) { if (cap<new_size)resize_cap(new_size, true); }
+
     template <class ...Args>
     void emplace(Args&&... args){
         if (size() >= cap)resize_cap(size());
@@ -189,15 +166,11 @@ public:
     }
 
     template <class ...Args>
-    void emplace_back(Args&&... args){emplace(args...);}
+    void emplace_back(Args&&... args) {emplace(args...);}
 
-    T &operator[](size_t rank)  {
-        return impl_begin[rank];
-    }
+    T &operator[](size_t rank) { return impl_begin[rank]; }
 
-    const T &operator[](size_t rank) const {
-        return impl_begin[rank];
-    }
+    const T &operator[](size_t rank) const { return impl_begin[rank]; }
 };
 
 

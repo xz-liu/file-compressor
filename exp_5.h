@@ -7,6 +7,7 @@
 
 #include <cstdlib>
 #include <functional>
+#include "queue.h"
 
 /// binary search O(log(n))
 template<class T, class RandomIt, class Comp=std::less<>>
@@ -40,6 +41,7 @@ void quick_sort(Iter begin, Iter end, Comp comp=std::less<>()){
         quick_sort(p + 1, end, comp);
     }
 }
+
 
 void run_exp5_tests(){
     using std::cout;

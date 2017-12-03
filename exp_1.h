@@ -99,7 +99,7 @@ void run_exp1_tests() {
     listInt.insert(listInt.find(4), 5);
     output_list(listInt);
     cout << "Push back 11" << endl;
-    listInt.push_back(11);
+    listInt.emplace(11);
     output_list(listInt);
     cout << "Push front 0" << endl;
     listInt.push_front(0);

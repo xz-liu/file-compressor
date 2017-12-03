@@ -24,7 +24,6 @@ class huffman : public bin_tree<CharT> {
         size_t node_count;
         CharT node_char;
         ptr node_ptr;
-
         triple(size_t c, CharT ch, ptr p)
                 : node_count(c), node_char(ch), node_ptr(p) {}
         triple(){}
@@ -34,7 +33,7 @@ class huffman : public bin_tree<CharT> {
     };
     std::basic_string<CharT> original_str;
     priority_queue<triple, vector<triple>, std::greater<>> min_heap;
-    std::vector<code_pair> codes;
+    std::map<CharT,bit_ref> codes;
     std::map<CharT, size_t> ref_map;
     ptr &root = bin_tree<CharT>::root;
 
@@ -44,21 +43,33 @@ class huffman : public bin_tree<CharT> {
 
     ptr &ptr_of(triple &t) { return t.node_ptr; }
 
-    bit_ref next_bit(bit_ref ref, bool val) {
-        return (ref << 1) | (bit_ref) (val);
-    }
+    bit_ref next_bit(bit_ref ref, bool val)
+    { return (ref << 1) | (bit_ref) (val); }
+
+    inline size_t bsr(bit_ref ref)
+    { return sizeof(bit_ref)*8-__builtin_clz(ref)-1;}
 
     void construct(ptr now, bit_ref code) {
-        if (now->is_leaf())
-            codes.emplace_back(now->val, code);
-        else {
-            if (now->has_lchild())
-                construct(now->lc, next_bit(code, 0));
-            if (now->has_rchild())
-                construct(now->rc, next_bit(code, 1));
+        if (now->is_leaf()) {
+            codes.insert({now->val, code});
+            return;
         }
+        if (now->has_lchild())
+            construct(now->lc, next_bit(code, 0));
+        if (now->has_rchild())
+            construct(now->rc, next_bit(code, 1));
+    }
+    template <class Out,class Struct>
+    static void write_obj(Out &out, Struct u){
+        out.write(reinterpret_cast<CharT*>(&u), sizeof(u));
     }
 
+    template <class Struct,class In>
+    static Struct read_obj(In &in){
+        Struct u;
+        in.read(reinterpret_cast<CharT*>(&u), sizeof(u));
+        return u;
+    }
 public:
     explicit huffman(const std::basic_string<CharT> &str):
             original_str((str)){
@@ -89,9 +100,42 @@ public:
 
     std::map<CharT, size_t> counts() { return ref_map; }
 
-    std::vector<code_pair> encoding() { return codes; }
+    std::map<CharT,bit_ref> encoding() { return codes; }
 
     std::basic_string<CharT> str(){ return original_str;}
+
+    template <class Out>void write(Out& out) {
+        write_obj(out, original_str.size());
+        write_obj(out, codes.size());
+        for (auto &&p : codes) write_obj(out,p);
+        vector<bit_ref> buffer(1);
+        const size_t ref_size = sizeof(bit_ref) * 8;
+        size_t sz_now = buffer.back() = 0;
+        for (auto &&item : original_str) {
+            size_t first_1 = bsr(codes[item]);
+            bit_ref code = codes[item] & ~(1 << first_1);
+            buffer.back() |= (code) << sz_now;
+            if (sz_now + first_1 > ref_size) {
+                sz_now = sz_now + first_1 - ref_size;
+                buffer.push_back(code >> (first_1 - sz_now));
+            } else sz_now += first_1;
+        }
+        for (auto &&item: buffer) {
+            out.write(reinterpret_cast<CharT *>(&item), sizeof(item));
+        }
+    }
+    template <class In,class Out> static void read(In& in,Out & out) {
+        const size_t char_size = sizeof(CharT) * 8;
+        const bit_ref mask = (bit_ref) -1;
+        size_t para_size = read_obj<size_t>(in)
+            , codes_size = read_obj<size_t>(in);
+        std::map<CharT, bit_ref> codes;
+        while (codes_size--)codes.insert(read_obj<code_pair>(in));
+        CharT now;
+        bit_ref code_now = 1;
+        size_t code_size = 0;
+        auto code = [&]() { return code_now | (1U << code_size); };
+    }
 };
 
 

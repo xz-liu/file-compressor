@@ -46,8 +46,7 @@ protected:
 
 public:
     bst() : bin_tree<T>(){}
-    bst(std::initializer_list<T>&& lst)
-            :bst(){
+    bst(std::initializer_list<T>&& lst) :bst(){
         for(auto x:lst){insert(x);}
     }
     position &find(const T &val) {

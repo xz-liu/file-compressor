@@ -8,6 +8,7 @@
 
 int main() {
 //    freopen("D:\\x.txt","w",stdout);
+
     run_exp1_tests();
     run_exp2_tests();
     run_exp3_tests();

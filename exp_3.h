@@ -29,17 +29,59 @@ void run_exp3_tests() {
     cout << endl << "Exp 3 :binary trees" << endl << endl;
     cout << "Test huffman tree" << endl;
 
-    auto res = huffman<char>("aaaaabbccccdefg");
+    auto res = huffman<char>("Wind, and my heart swimming in collected words \n"
+                                     "Moved by the wind, in through the world. \n"
+                                     "Clouds, like a voice that we all recognize \n"
+                                     "Carry the holding future. \n"
+                                     "\n"
+                                     "Moon, on the sky as a trembling heart \n"
+                                     "Shown on the glass unsteadily. \n"
+                                     "Stars, shedding tears in an overflowing stream \n"
+                                     "I see the night all around me. \n"
+                                     "\n"
+                                     "Suteki da ne \n"
+                                     "Being together, all alone walking hand in hand. \n"
+                                     "And I want to go to your city \n"
+                                     "To your home, into your arms. \n"
+                                     "\n"
+                                     "That soul \n"
+                                     "Inside your body \n"
+                                     "From those conflicted nights \n"
+                                     "As from my dreams. \n"
+                                     "\n"
+                                     "Wind died away, and I feel all the words \n"
+                                     "Led by a gentle illusion. \n"
+                                     "Clouds are the future that cannot be attained \n"
+                                     "Told from impossible distance. \n"
+                                     "\n"
+                                     "The moon filled with night as it flowed through your heart \n"
+                                     "Such faraway reflections. \n"
+                                     "Stars, ripe like tears, like fruit falls from a tree \n"
+                                     "I wipe my dreams off the nighttime. \n"
+                                     "\n"
+                                     "Suteki da ne \n"
+                                     "Being together, all alone walking hand in hand. \n"
+                                     "And I want to go to your city \n"
+                                     "To your home, into your arms. \n"
+                                     "\n"
+                                     "To feel your face \n"
+                                     "The touch of memory \n"
+                                     "And now that I awake \n"
+                                     "As from a dream.");
     cout << "Original string: " << res.str() << endl;
+    std::stringstream outss;
+    res.write(outss);
     cout << "Char counts" << endl;
-    for (auto &x:res.counts()) {
+    for (auto &&x:res.counts()) {
         cout << x.first << ":" << x.second << endl;
     }
     cout << "Encoding" << endl;
-    for (auto x:res.encoding()) {
+    for (auto &&x:res.encoding()) {
         cout << x.first << ":" << bitset<8>(x.second) << endl;
     }
-
+//    cout<<"Code:"<<outss.str()<<endl;
+    cout<<"Code length:"<<outss.str().size()<<endl;
+    cout<<"Original length:"<<res.str().size()<<endl;
     bin_tree<char> char_tree;
     std::stringstream ss("abc##de#g##f###");
     cout << "Test traverse" << endl;

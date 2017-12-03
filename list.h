@@ -85,6 +85,17 @@ public:
         list_size++;
     }
 
+    template <class ...Args>
+    void emplace(Args&& ... args) {
+        if (tail) {
+            list_node<T>::insert(tail, new list_node<T>(args..., nullptr, tail));
+            next_node(tail);
+        } else if (head)
+            list_node<T>::insert(head, tail = new list_node<T>(args..., nullptr, head));
+        else head = new list_node<T>(args...);
+        list_size++;
+    }
+
     void push_front(const T &value) {
         if (head) {
             list_node<T>::insert_before(head,
