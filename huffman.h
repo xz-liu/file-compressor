@@ -6,8 +6,12 @@
 #define DATA_STRUCTURE_EXP_HUFFMAN_H
 
 #include <functional>
+#include <iostream>
+#include <sstream>
+#include <fstream>
 #include <utility>
 #include <string>
+#include <bitset>
 #include <map>
 #include "bin_tree.h"
 
@@ -70,6 +74,47 @@ class huffman : public bin_tree<CharT> {
         in.read(reinterpret_cast<CharT*>(&u), sizeof(u));
         return u;
     }
+
+    void construct(ptr now, bit_ref code, size_t code_len, CharT val) {
+        if (code_len)
+            if (code & (1 << (code_len - 1))) {
+                if (!now->has_rchild())
+                    now->insert_as_rchild(CharT());
+                construct(now->rc, code, code_len - 1, val);
+            } else {
+                if (!now->has_lchild())
+                    now->insert_as_lchild(CharT());
+                construct(now->lc, code, code_len - 1, val);
+            }
+        else now->val = val;
+
+    }
+
+
+    bit_ref make_code(bit_ref n,size_t sz) {
+        bit_ref res = 0;
+        for (int i = 0; i < 8 * sizeof(bit_ref); ++i)
+            res |= ((n >> i) & 1) << (8 * sizeof(bit_ref) - 1 - i);
+        return res >> (sizeof(bit_ref) * 8 - sz);
+    }
+
+    template <class Out>
+    void get_original(const ::vector<bool>& bits,size_t rank,Out& out,ptr now){
+        if(rank>=bits.size())return;
+        if (now->is_leaf()){
+            out<<now->val;
+            get_original(bits,rank,out,root);
+        } else{
+            bool right=bits[rank];
+            get_original(bits,rank+1,out,right?now->rc:now->lc);
+        }
+    }
+
+    template <class Out>
+    void get_original(const ::vector<bool> &bits,Out& out){
+        get_original(bits,0,out,root);
+    }
+
 public:
     explicit huffman(const std::basic_string<CharT> &str):
             original_str((str)){
@@ -97,6 +142,18 @@ public:
         }
         construct(root, 1);
     }
+    explicit huffman(const std::basic_istream<CharT>& in){
+        std::basic_stringstream<CharT> ss;
+        CharT now;while (in>>now)ss<<now;
+        huffman(ss.str());
+    }
+
+    explicit huffman(const std::map<bit_ref,CharT>& rev_codes){
+        root=new bintree_node<CharT>();
+        for (auto &&item : rev_codes) {
+            construct(root,item.first,bsr(item.first),item.second);
+        }
+    }
 
     std::map<CharT, size_t> counts() { return ref_map; }
 
@@ -107,13 +164,16 @@ public:
     template <class Out>void write(Out& out) {
         write_obj(out, original_str.size());
         write_obj(out, codes.size());
-        for (auto &&p : codes) write_obj(out,p);
+        for (auto &&p : codes) {
+            write_obj(out,p.first);
+            write_obj(out,p.second);
+        }
         vector<bit_ref> buffer(1);
         const size_t ref_size = sizeof(bit_ref) * 8;
         size_t sz_now = buffer.back() = 0;
         for (auto &&item : original_str) {
             size_t first_1 = bsr(codes[item]);
-            bit_ref code = codes[item] & ~(1 << first_1);
+            bit_ref code = make_code(codes[item],first_1);
             buffer.back() |= (code) << sz_now;
             if (sz_now + first_1 > ref_size) {
                 sz_now = sz_now + first_1 - ref_size;
@@ -122,19 +182,31 @@ public:
         }
         for (auto &&item: buffer) {
             out.write(reinterpret_cast<CharT *>(&item), sizeof(item));
+            std::cout<<item<<" "<<std::bitset<32>(item)<<std::endl;
         }
     }
     template <class In,class Out> static void read(In& in,Out & out) {
         const size_t char_size = sizeof(CharT) * 8;
-        const bit_ref mask = (bit_ref) -1;
+        const bit_ref code_mask = (bit_ref) -1;
         size_t para_size = read_obj<size_t>(in)
-            , codes_size = read_obj<size_t>(in);
-        std::map<CharT, bit_ref> codes;
-        while (codes_size--)codes.insert(read_obj<code_pair>(in));
-        CharT now;
-        bit_ref code_now = 1;
-        size_t code_size = 0;
-        auto code = [&]() { return code_now | (1U << code_size); };
+        , codes_size = read_obj<size_t>(in);
+        std::map<bit_ref, CharT> codes;
+        while (codes_size--) {
+            auto first=read_obj<CharT>(in);
+            auto second=read_obj<bit_ref>(in);
+            codes.insert({second,first});
+        }
+        for (auto &&item : codes) {
+            std::cout<<item.second<<" "<<std::bitset<32>(item.first)<<std::endl;
+        }
+        ::vector<bool> all;
+        CharT sz;
+        while (in >> sz && para_size)
+            for (int i = 0; i < char_size && para_size--; ++i) {
+                all.push_back(sz & 1);
+                sz >>= 1;
+            }
+        huffman<CharT>(codes).get_original(all, out);
     }
 };
 
