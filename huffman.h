@@ -40,6 +40,7 @@ class huffman : public bin_tree<CharT> {
     std::map<CharT,bit_ref> codes;
     std::map<CharT, size_t> ref_map;
     ptr &root = bin_tree<CharT>::root;
+    int para_size;
 
     size_t count_of(triple &t) { return t.node_count; }
 
@@ -99,20 +100,26 @@ class huffman : public bin_tree<CharT> {
     }
 
     template <class Out>
-    void get_original(const ::vector<bool>& bits,size_t rank,Out& out,ptr now){
-        if(rank>=bits.size())return;
-        if (now->is_leaf()){
-            out<<now->val;
-            get_original(bits,rank,out,root);
-        } else{
-            bool right=bits[rank];
-            get_original(bits,rank+1,out,right?now->rc:now->lc);
-        }
+    size_t get_original(const ::vector<bool>& bits,size_t rank,Out& out,ptr now){
+        if(rank>=bits.size())return rank;
+        if(para_size) {
+            if (now->is_leaf()) {
+                out << now->val;
+                para_size--;
+                return rank;
+            } else {
+                bool right = bits[rank];
+                return get_original(bits, rank + 1, out, right ? now->rc : now->lc);
+            }
+        } else return 0;
     }
 
     template <class Out>
     void get_original(const ::vector<bool> &bits,Out& out){
-        get_original(bits,0,out,root);
+        int rank=0;
+        while (rank<bits.size()&&para_size){
+            rank=get_original(bits,rank,out,root);
+        }
     }
 
 public:
@@ -148,10 +155,12 @@ public:
         huffman(ss.str());
     }
 
-    explicit huffman(const std::map<bit_ref,CharT>& rev_codes){
+    explicit huffman(const std::map<bit_ref,CharT>& rev_codes,int p_size)
+    :para_size(p_size){
         root=new bintree_node<CharT>();
         for (auto &&item : rev_codes) {
             construct(root,item.first,bsr(item.first),item.second);
+            codes.insert({item.second,item.first});
         }
     }
 
@@ -175,38 +184,34 @@ public:
             size_t first_1 = bsr(codes[item]);
             bit_ref code = make_code(codes[item],first_1);
             buffer.back() |= (code) << sz_now;
-            if (sz_now + first_1 > ref_size) {
+            if (sz_now + first_1 >= ref_size) {
                 sz_now = sz_now + first_1 - ref_size;
                 buffer.push_back(code >> (first_1 - sz_now));
             } else sz_now += first_1;
         }
         for (auto &&item: buffer) {
             out.write(reinterpret_cast<CharT *>(&item), sizeof(item));
-            std::cout<<item<<" "<<std::bitset<32>(item)<<std::endl;
         }
     }
     template <class In,class Out> static void read(In& in,Out & out) {
-        const size_t char_size = sizeof(CharT) * 8;
-        const bit_ref code_mask = (bit_ref) -1;
-        size_t para_size = read_obj<size_t>(in)
-        , codes_size = read_obj<size_t>(in);
+        const size_t ref_size = sizeof(bit_ref) * 8;
+        int para_size = read_obj<size_t>(in);
+        int codes_size = read_obj<size_t>(in);
         std::map<bit_ref, CharT> codes;
         while (codes_size--) {
             auto first=read_obj<CharT>(in);
             auto second=read_obj<bit_ref>(in);
-            codes.insert({second,first});
-        }
-        for (auto &&item : codes) {
-            std::cout<<item.second<<" "<<std::bitset<32>(item.first)<<std::endl;
+            codes.emplace(second,first);
         }
         ::vector<bool> all;
-        CharT sz;
-        while (in >> sz && para_size)
-            for (int i = 0; i < char_size && para_size--; ++i) {
+        bit_ref sz;
+        while (in.read(reinterpret_cast<CharT*>(&sz), sizeof(sz)))
+            for (int i = 0; i < ref_size ; ++i) {
                 all.push_back(sz & 1);
                 sz >>= 1;
             }
-        huffman<CharT>(codes).get_original(all, out);
+        huffman<CharT> tmp(codes,para_size);
+        tmp.get_original(all, out);
     }
 };
 

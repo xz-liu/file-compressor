@@ -9,11 +9,11 @@
 int main() {
 //    freopen("D:\\x.txt","w",stdout);
 
-    run_exp1_tests();
-    run_exp2_tests();
+//    run_exp1_tests();
+//    run_exp2_tests();
     run_exp3_tests();
-    run_exp4_tests();
-    run_exp5_tests();
+//    run_exp4_tests();
+//    run_exp5_tests();
     std::cin.get();
     return 0;
 }
