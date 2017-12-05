@@ -9,6 +9,7 @@
 #include "vector.h"
 #include "queue.h"
 #include <numeric>
+#include <algorithm>
 #include <functional>
 template <class T>
 struct graph_mat: public vector<vector<T>>{

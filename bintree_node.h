@@ -7,11 +7,7 @@
 
 #include <functional>
 #include <cstdlib>
-#include <queue>
 #include "queue.h"
-
-template <class T>
-class bin_tree;
 
 template <class T>
 struct bintree_node {
@@ -42,7 +38,7 @@ struct bintree_node {
 
     static void move_to_parent(bnode_ptr &ptr) { ptr = ptr->parent; }
 
-    bool has_parent() const { if(!this)return true;return (bool) parent; }
+    bool has_parent() const { if(!this)return true;return  parent; }
 
     bool is_root()const { return !has_parent(); }
 
@@ -50,9 +46,9 @@ struct bintree_node {
 
     bool is_rchild() const{ return !is_root() && (this == parent->rc); }
 
-    bool has_lchild() const{ return (bool) lc; }
+    bool has_lchild() const{ return lc; }
 
-    bool has_rchild() const{ return (bool) rc; }
+    bool has_rchild() const{ return rc; }
 
     bool has_child() const{ return has_lchild() || has_rchild(); }
 
@@ -63,9 +59,9 @@ struct bintree_node {
     bnode_ptr& sibling() { return is_lchild() ? parent->rc : parent->lc; }
 
     bnode_ptr& uncle() {return parent->is_lchild() ? parent->parent->rc : parent->parent->lc; }
-
-    void set_parent_ref(bnode_ptr ptr){
-        if (!this)return;
+	
+    void set_parent_ref(bnode_ptr ptr){	
+    	if (!this)return;
         if (is_root())return;
         if(is_lchild())parent->lc=ptr;
         else parent->rc=ptr;
@@ -100,21 +96,21 @@ struct bintree_node {
 
     bool operator==(bintree_node const &bn) const { return val == bn.val; }
 
-#define _base if (!this)return;
-#define _vis visit(val);
-#define _to_ch(child_type,trav_type) \
+#define _BASE if (!this)return;
+#define _VIS visit(val);
+#define _NEXT_CHILD(child_type,trav_type) \
     child_type->trav_##trav_type##_order(visit);
 
-#define _bintree_node_trav_(trav_type,body)\
-    void trav_##trav_type##_order(visit_func visit) {_base body } \
-    void trav_##trav_type##_order(const_visit_func visit) const {_base body}
+#define _BINTREE_NODE_TRAV(trav_type,body)\
+    void trav_##trav_type##_order(visit_func visit) {_BASE body } \
+    void trav_##trav_type##_order(const_visit_func visit) const {_BASE body}
 
-    _bintree_node_trav_(in, _to_ch(lc,in) _vis _to_ch(rc,in))
-    _bintree_node_trav_(pre, _vis _to_ch(lc,pre)_to_ch(rc,pre))
-    _bintree_node_trav_(post, _to_ch(lc,post)_to_ch(rc,post)_vis)
+    _BINTREE_NODE_TRAV(in, _NEXT_CHILD(lc,in) _VIS _NEXT_CHILD(rc,in))
+    _BINTREE_NODE_TRAV(pre, _VIS _NEXT_CHILD(lc,pre)_NEXT_CHILD(rc,pre))
+    _BINTREE_NODE_TRAV(post, _NEXT_CHILD(lc,post)_NEXT_CHILD(rc,post)_VIS)
 
-#undef _bintree_node_trav_
-#define _bintree_node_trav_level(prefix,attr)\
+#undef _BINTREE_NODE_TRAV
+#define _BINTREE_NODE_TRAV_LEVEL(prefix,attr)\
     void trav_level(prefix##visit_func visit) attr{\
         queue<prefix##bnode_ptr> Q;Q.push(this);\
         while (!Q.empty()){\
@@ -125,13 +121,13 @@ struct bintree_node {
         }\
     }
 
-    _bintree_node_trav_level(,)
-    _bintree_node_trav_level(const_, const)
+    _BINTREE_NODE_TRAV_LEVEL(,)
+    _BINTREE_NODE_TRAV_LEVEL(const_, const)
 
-#undef _bintree_node_trav_level
-#undef _to_ch
-#undef _vis
-#undef _base
+#undef _BINTREE_NODE_TRAV_LEVEL
+#undef _NEXT_CHILD
+#undef _VIS
+#undef _BASE
 };
 
 #endif //DATA_STRUCTURE_EXP_BINTREE_NODE_H

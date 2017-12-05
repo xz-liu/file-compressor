@@ -6,8 +6,9 @@
 #define DATA_STRUCTURE_EXP_EXP_4_H
 
 #include "graph.h"
+#include <iostream>
 
-void run_exp4_tests() {
+inline void run_exp4_tests() {
     using std::cout;
     using std::endl;
     cout << "Exp 4 : graph" << endl;

@@ -7,10 +7,6 @@
 
 #include "bintree_node.h"
 
-
-template <class T>
-void pre_order_init(std::istream& in,bin_tree<T>& new_tree);
-
 template <class T>
 class bin_tree {
 protected:
@@ -88,18 +84,18 @@ public:
 
     virtual void clear(){remove_subtree(this,root);}
 
-#define _bintree_trav_(type_name)\
+#define BINTREE_TRAV(type_name)\
 void trav_##type_name(visit_func vis)\
 {if(root)root->trav_##type_name(vis);}\
 void trav_##type_name(const_visit_func vis)const\
 {if(root)root->trav_##type_name(vis);}
 
-    _bintree_trav_(level)
-    _bintree_trav_(in_order)
-    _bintree_trav_(pre_order)
-    _bintree_trav_(post_order)
+    BINTREE_TRAV(level)
+    BINTREE_TRAV(in_order)
+    BINTREE_TRAV(pre_order)
+    BINTREE_TRAV(post_order)
 
-#undef _bintree_trav_
+#undef BINTREE_TRAV
 
     T& front(){ return **begin_node(); }
     const T& front()const { return **end_node();}
@@ -114,9 +110,6 @@ void trav_##type_name(const_visit_func vis)const\
 
     position& get_root(){ return root; }
     const_position get_root()const { return root;}
-
-
-
 };
 
 #endif //DATA_STRUCTURE_EXP_BIN_TREE_H

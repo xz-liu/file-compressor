@@ -13,16 +13,7 @@
 #include <iomanip>
 #include "list.h"
 #include "vector.h"
-
-
-template<class Seq>
-void output_list(const Seq &list) {
-    std::cout << "Size:" << list.size() << " Pos:" << (&list) << std::endl;
-    for (const auto &x:list) {
-        std::cout << x << " ";
-    }
-    std::cout << std::endl;
-}
+#include "basic.h"
 
 template<class T, class Comp=std::less<>>
 void merge_list(const list<T> &first, const list<T> &second,
