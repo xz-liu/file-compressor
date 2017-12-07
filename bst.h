@@ -14,9 +14,11 @@ struct bst : bin_tree<T> {
 protected:
     using position =typename bin_tree<T>::ptr;
     Comp comp;
-    position hot,&root=bin_tree<T>::root;
+	position hot;
+#ifndef _MSC_VER
+	position &root = bin_tree<T>::root;
     int &tree_size=bin_tree<T>::tree_size;
-
+#endif
     position &search_in(position& rt, const T &val, position &hot) {
 #define _IS_EQUAL(a, b, comp) (!comp(a,b) && !comp(b,a))
         if (!rt || _IS_EQUAL(val, rt->val, comp))return rt;
@@ -57,7 +59,7 @@ public:
         position &x = find(val);
         if (x)return x;
         x = new bintree_node<T>(val, hot);
-        tree_size++;
+        ++tree_size;
         this->update_height_above(x);
         return x;
     }
@@ -66,7 +68,7 @@ public:
         position &x = find(val);
         if (!x)return false;
         remove_at(x, hot);
-        tree_size--;
+        --tree_size;
         this->update_height_above(hot);
         return true;
     }

@@ -18,19 +18,17 @@ struct bintree_node {
     T val;
     bintree_node *parent, *lc, *rc;
     int node_height;
-    int npl;
     static int stature(bnode_ptr ptr) {
         return ptr ? ptr->node_height : -1;
     }
 
     bintree_node()
-    : parent(nullptr), lc(nullptr), rc(nullptr), node_height(0), npl(1){}
+    : parent(nullptr), lc(nullptr), rc(nullptr), node_height(0){}
 
     explicit bintree_node(const T &val, bnode_ptr parent = nullptr,
                 bnode_ptr lchild = nullptr, bnode_ptr rchild = nullptr,
                 int height = 0, int null_path_length = 1)
-    : val(val), parent(parent), lc(lchild), rc(rchild), node_height(height),
-      npl(null_path_length) {}
+    : val(val), parent(parent), lc(lchild), rc(rchild), node_height(height){}
 
     static void move_to_lc(bnode_ptr &ptr) { ptr = ptr->lc; }
 

@@ -39,7 +39,6 @@ ulong __inline __builtin_clz(ulong value) {
 #endif // _MSC_VER
 
 struct binary_io {
-
 	template<class Out, class Struct>
 	static void write_obj(Out &out, Struct u) {
 		out.write(reinterpret_cast<typename Out::char_type *>(&u), sizeof(u));

@@ -11,7 +11,6 @@
 #include <fstream>
 #include <utility>
 #include <string>
-#include <bitset>
 #include <vector>
 #include <map>
 #include "basic.h"
@@ -41,7 +40,7 @@ class huffman : public bin_tree<CharT>,binary_io{
 		}
 	};
 
-	std::basic_string<CharT> original_str;
+	std::vector<CharT> original_str;
 	std::map<CharT, code_ref> codes;
 	std::map<CharT, size_t> ref_map;
 #ifndef _MSC_VER
@@ -95,8 +94,8 @@ class huffman : public bin_tree<CharT>,binary_io{
 
 
 	void construct() {
-		::priority_queue<info, ::vector<info>, std::greater<>> min_heap;
-		for (auto c : original_str)ref_map[c]++;
+		priority_queue<info, vector<info>, std::greater<>> min_heap;
+		for (auto c : original_str)++ref_map[c];
 		for (auto p : ref_map)
 			min_heap.emplace(p.second, p.first, nullptr);
 		while (true) {
@@ -126,7 +125,7 @@ class huffman : public bin_tree<CharT>,binary_io{
 		if (rank >= bits.size())return rank;
 		if (!para_size)return 0;
 		if (now->is_leaf()) {
-			out << now->val;
+			write_obj(out,now->val);
 			para_size--;
 			return rank;
 		}
@@ -147,17 +146,20 @@ public:
 	explicit huffman(std::basic_istream<CharT> &in) {
 		std::basic_stringstream<CharT> ss;
 		CharT now;
-		while (read_obj(in, now)) ss << now;
-		original_str = ss.str();
+		while (read_obj(in, now))
+			original_str.emplace_back(now);
 		construct();
 	}
 
 	explicit huffman(const std::basic_string<CharT> &str)
-		:original_str((str)) {
+		:original_str(str.begin(),str.end()) {
 		construct();
 	}
-
-	explicit huffman(const std::map<code_ref, CharT> &rev_codes, int p_size)
+	
+	template<class Iter>huffman(Iter begin, Iter end) 
+	: original_str(begin, end) { construct(); }
+	
+	huffman(const std::map<code_ref, CharT> &rev_codes, int p_size)
 		: para_size(p_size) {
 		root = new bintree_node<CharT>();
 		for (auto &&item : rev_codes) {
@@ -170,7 +172,7 @@ public:
 
 	std::map<CharT, code_ref> encoding() { return codes; }
 
-	std::basic_string<CharT> str() { return original_str; }
+	std::vector<CharT> str() { return original_str; }
 
 	template<class Out> void write(Out &out) {
 		write_obj(out, original_str.size());

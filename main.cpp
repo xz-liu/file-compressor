@@ -7,15 +7,22 @@
 #include "exp_5.h"
 
 int main() {
-//    freopen("D:\\x.txt","w",stdout);
-
-//    run_exp1_tests();
-//    run_exp2_tests();
-    run_exp3_tests();
-//    run_exp4_tests();
-//    run_exp5_tests();
-    std::cin.get();
-    return 0;
+	//    freopen("D:\\x.txt","w",stdout);
+	uint i;
+#define RUN_CASE(x) case x:run_exp##x##_tests();break
+	do {
+		std::cout << "Choose a number from 1 to 5" << std::endl;
+		std::cin >> i;
+		switch (i) {
+			RUN_CASE(1);
+			RUN_CASE(2);
+			RUN_CASE(3);
+			RUN_CASE(4);
+			RUN_CASE(5);
+		default:break;;
+		}
+	} while (i<=5&&i>0);
+	return 0;
 }
 
 

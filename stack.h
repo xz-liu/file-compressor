@@ -8,7 +8,7 @@
 #include "vector.h"
 
 template <class T>
-class stack:private vector<T>{
+class stack: vector<T>{
 public:
     stack():vector<T>(){}
     void push(const T& val){
@@ -17,10 +17,10 @@ public:
     void pop(){
         vector<T>::pop_back();
     }
-    size_t size(){
+    size_t size() const{
         return vector<T>::size();
     }
-    bool empty(){
+    bool empty() override{
         return vector<T>::empty();
     }
     T& top(){

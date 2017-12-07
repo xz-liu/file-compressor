@@ -6,7 +6,7 @@
 #define DATA_STRUCTURE_EXP_BIN_TREE_H
 
 #include "bintree_node.h"
-
+#include <algorithm>
 template <class T>
 class bin_tree {
 protected:
