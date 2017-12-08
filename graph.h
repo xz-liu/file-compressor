@@ -5,14 +5,16 @@
 #ifndef DATA_STRUCTURE_EXP_GRAPH_H
 #define DATA_STRUCTURE_EXP_GRAPH_H
 
-#include "list.h"
-#include "vector.h"
-#include "queue.h"
+
+#include <vector>
+#include <queue>
 #include <numeric>
 #include <algorithm>
 #include <functional>
+#include "queue.h"
+#include "vector.h"
 template <class T>
-struct graph_mat: public vector<vector<T>>{
+struct graph_mat: vector<vector<T>>{
     explicit graph_mat(int N)
     :vector<vector<T>>(N,vector<T>(N,0)){}
     graph_mat(const std::initializer_list<::vector<T>>& list)
@@ -41,6 +43,9 @@ struct graph_edge{
     size_t from;
     size_t to;
     T val;
+	graph_edge(size_t f,size_t t,T const& v )
+		:from(f),to(t),val(v){}
+	graph_edge() = default;
 };
 
 struct graph_node{
@@ -50,14 +55,14 @@ struct graph_node{
 
 template <class Node,class Edge>
 struct graph_list{
-    vector<graph_edge<Edge>> edges;
-    vector<vector<graph_node>> out,in;
-    vector<Node> node_vals;
+	vector<graph_edge<Edge>> edges;
+	vector<vector<graph_node>> out,in;
+	vector<Node> node_vals;
     explicit graph_list(size_t N,const Node& x=Node())
             :out(N),in(N),node_vals(N,x){}
 
     void add_edge(size_t u,size_t v,const Edge& e){
-        edges.push_back({u,v,e});
+		edges.push_back({ u, v, e });
         in[v].push_back({u,edges.size()-1});
         out[u].push_back({v,edges.size()-1});
     }

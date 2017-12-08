@@ -53,7 +53,7 @@ inline void run_exp3_tests() {
 
 	huffman<char>::read(read_compressed, processed_text);
 	read_compressed.close(); processed_text.close();
-	const size_t compressed_size = file_size(compressed),
+	const uintmax_t compressed_size = file_size(compressed),
 		original_size = file_size(original_txt);
 	cout << "Compressed length:" << compressed_size << endl;
 	cout << "Original length:" << original_size << endl;

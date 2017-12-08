@@ -12,13 +12,15 @@ inline void run_exp4_tests() {
     using std::cout;
     using std::endl;
     cout << "Exp 4 : graph" << endl;
-    graph_mat<int> graph{
-            {1, 1, 0, 1, 1},
-            {1, 1, 0, 0, 0},
-            {0, 1, 1, 1, 1},
-            {0, 0, 0, 0, 1},
-            {1, 0, 1, 0, 1}
-    }, calDijk{
+	graph_mat<int> graph{
+			{1, 1, 0, 1, 1},
+			{1, 1, 0, 0, 0},
+			{0, 1, 1, 1, 1},
+			{0, 0, 0, 0, 1},
+			{1, 0, 1, 0, 1}
+	};
+
+	graph_mat<int> calDijk{
             {0,   inf, 1, inf, inf},
             {inf, 0,   9, inf, 8},
             {inf, 19,  0, inf, inf},

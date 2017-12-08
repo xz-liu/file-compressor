@@ -33,14 +33,14 @@ class huffman : public bin_tree<CharT>,binary_io{
 		info(size_t c, CharT ch, ptr p)
 			: node_count(c), node_char(ch), node_ptr(p) {}
 
-		info() {}
+		info() = default;
 
 		bool operator>(const info &t) const {
 			return node_count > t.node_count;
 		}
 	};
 
-	std::vector<CharT> original_str;
+	vector<CharT> original_str;
 	std::map<CharT, code_ref> codes;
 	std::map<CharT, size_t> ref_map;
 #ifndef _MSC_VER
@@ -172,7 +172,7 @@ public:
 
 	std::map<CharT, code_ref> encoding() { return codes; }
 
-	std::vector<CharT> str() { return original_str; }
+	vector<CharT> original() { return original_str; }
 
 	template<class Out> void write(Out &out) {
 		write_obj(out, original_str.size());
