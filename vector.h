@@ -6,7 +6,6 @@
 #define DATA_STRUCTURE_EXP_VECTOR_H
 #include <memory>
 #include <iterator>
-#include <allocators>
 #include <type_traits>
 
 template<class T, class Allocator=std::allocator<T>>
