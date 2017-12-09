@@ -8,7 +8,7 @@
 #include <iterator>
 #include <type_traits>
 
-template<class T, class Allocator=std::allocator<T>>
+template<class T, class Alloc=std::allocator<T>>
 class vector {
 public:
 	typedef T value_type;
@@ -21,12 +21,13 @@ public:
 		std::reverse_iterator<iterator>;
 	using const_reverse_iterator =
 		std::reverse_iterator<const_iterator>;
+	using allocator_type = Alloc;
 protected:
 	static constexpr size_t MIN_ALLOC = 128;
 	T *impl_begin,* impl_end;
 	size_t impl_cap;
-	Allocator alloc;
-
+	Alloc alloc;
+	typedef const Alloc & _al_param;
 	template<class _T>
 	std::enable_if_t<std::conjunction_v<std::is_default_constructible<_T>>>
 	init_construct(_T* sz){while (sz!=impl_begin)alloc.construct(--sz);}
@@ -132,21 +133,20 @@ public:
 			alloc.construct(n, val);
 	}
 
-	vector() { init_cap(0); }
+	allocator_type get_allocator()const{return alloc;}
 
-	template<class Iter>vector(Iter begin,Iter end){
+	vector(_al_param _alloc=Alloc()):alloc(_alloc) { init_cap(0); }
+
+	template<class Iter>vector(Iter begin,Iter end,_al_param _a=Alloc())
+	:alloc(_a){
 		init_cap(std::distance(begin, end));
 		while (begin != end) alloc.construct (impl_end++,*begin++);
 	}
 
-	vector(std::initializer_list<T> init_list)
-		: vector() {
-		for (auto x : init_list) {
-			push_back(x);
-		}
-	}
+	vector(std::initializer_list<T> init_list,_al_param _a=Alloc())
+	: vector(_a){ for (auto x : init_list) push_back(x); }
 
-	vector(const vector &rhs) {
+	vector(const vector &rhs):alloc(rhs.get_allocator()) {
 		init_cap(rhs.size());
 		for (const auto &x : rhs) {
 			alloc.construct(impl_end++,x);
@@ -155,26 +155,20 @@ public:
 
 	vector &operator=(const vector &rhs) {
 		resize_cap(rhs.size(), false);
-		T *now = impl_begin;
-		for (const auto &x : rhs) {
-			alloc.construct(now++,x);
-		}
-		impl_end = impl_begin + rhs.size();
+		for (const auto &x : rhs)
+			alloc.construct(impl_end++, x);
 		return *this;
 	}
 
-	explicit vector(size_t size) {
-		init_cap(size);
-		init_construct(size);
-	}
+	explicit vector(size_t size,_al_param al=Alloc())
+	:alloc(al) {init_cap(size);init_construct(size);}
 
-	vector(size_t size, const T &init_with)  {
+	vector(size_t size, const T &init_with, _al_param al = Alloc())
+		:alloc(al) {
 		init_cap(size);
 		impl_end = impl_begin + size;
 		iterator now = begin();
-		while (now != impl_end) {
-			alloc.construct(now++,init_with);
-		}
+		while (now != impl_end) alloc.construct(now++,init_with);
 	}
 
 	virtual ~vector() {
