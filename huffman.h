@@ -14,12 +14,13 @@
 #include <vector>
 #include <map>
 #include "basic.h"
+#include "vector.h"
 #include "bin_tree.h"
 
 
 template<class CharT>
 class huffman : public bin_tree<CharT>,binary_io{
-
+public:
 	using ptr = typename bintree_node<CharT>::bnode_ptr;
 	using const_ptr = typename bintree_node<CharT>::const_bnode_ptr;
 	using code_ref = unsigned int;
@@ -33,14 +34,12 @@ class huffman : public bin_tree<CharT>,binary_io{
 		info(size_t c, CharT ch, ptr p)
 			: node_count(c), node_char(ch), node_ptr(p) {}
 
-		info() = default;
-
 		bool operator>(const info &t) const {
 			return node_count > t.node_count;
 		}
 	};
-
-	vector<CharT> original_str;
+private:
+	::vector<CharT> original_str;
 	std::map<CharT, code_ref> codes;
 	std::map<CharT, size_t> ref_map;
 #ifndef _MSC_VER
@@ -94,7 +93,7 @@ class huffman : public bin_tree<CharT>,binary_io{
 
 
 	void construct() {
-		priority_queue<info, vector<info>, std::greater<>> min_heap;
+		priority_queue<info, ::vector<info>, std::greater<>> min_heap;
 		for (auto c : original_str)++ref_map[c];
 		for (auto p : ref_map)
 			min_heap.emplace(p.second, p.first, nullptr);
@@ -143,6 +142,8 @@ class huffman : public bin_tree<CharT>,binary_io{
 
 public:
 	
+	huffman(const huffman& rhs) = default;
+
 	explicit huffman(std::basic_istream<CharT> &in) {
 		std::basic_stringstream<CharT> ss;
 		CharT now;
@@ -172,7 +173,7 @@ public:
 
 	std::map<CharT, code_ref> encoding() { return codes; }
 
-	vector<CharT> original() { return original_str; }
+	::vector<CharT> original() { return original_str; }
 
 	template<class Out> void write(Out &out) {
 		write_obj(out, original_str.size());
@@ -181,7 +182,7 @@ public:
 			write_obj(out, p.first);
 			write_obj(out, p.second);
 		}
-		std::vector<code_ref> buffer(1);
+		::vector<code_ref> buffer(1);
 		const size_t ref_size = sizeof(code_ref) * 8;
 		size_t sz_now = buffer.back() = 0;
 		for (auto &&item : original_str) {
@@ -197,7 +198,7 @@ public:
 		for (auto &&item : buffer) write_obj(out, item);
 	}
 
-	template<class In, class Out> static void read(In &in, Out &out) {
+	template<class In, class Out> static huffman read(In &in, Out &out) {
 		const size_t ref_size = sizeof(code_ref) * 8;
 		int para_size = read_obj<size_t>(in);
 		int codes_size = read_obj<size_t>(in);
@@ -214,7 +215,9 @@ public:
 				all.push_back(sz & 1);
 				sz >>= 1;
 			}
-		huffman<CharT>(codes, para_size).get_original(all, out);
+		huffman<CharT> _ret_val(codes, para_size);
+		_ret_val.get_original(all, out);
+		return _ret_val;
 	}
 };
 

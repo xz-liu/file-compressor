@@ -5,11 +5,14 @@
 #ifndef DATA_STRUCTURE_EXP_EXP_3_H
 #define DATA_STRUCTURE_EXP_EXP_3_H
 
+
+
+
 #include <iostream>
 #include <functional>
 #include <bitset>
 #include <sstream>
-#include <filesystem>
+#include <experimental/filesystem>
 #include "huffman.h"
 #include "bin_tree.h"
 #include "bst.h"
@@ -29,7 +32,7 @@ inline void run_exp3_tests() {
 	cout << "Test huffman tree" << endl;
 	
 	namespace filesystem = std::experimental::filesystem;
-	const filesystem::path original_txt("ORIGINAL.txt"), 
+    filesystem::path original_txt("ORIGINAL.txt"),
 				compressed("ORIGINAL.COMPRESSED"),		
 				processed ("PROCESSED.txt");
 	std::ifstream input_text(original_txt,ios::binary);
@@ -53,8 +56,8 @@ inline void run_exp3_tests() {
 
 	huffman<char>::read(read_compressed, processed_text);
 	read_compressed.close(); processed_text.close();
-	const uintmax_t compressed_size = file_size(compressed),
-		original_size = file_size(original_txt);
+	const uintmax_t compressed_size = filesystem::file_size(compressed),
+		original_size = filesystem::file_size(original_txt);
 	cout << "Compressed length:" << compressed_size << endl;
 	cout << "Original length:" << original_size << endl;
 	cout << "Compression rate:" << ((double)compressed_size) / original_size << endl;

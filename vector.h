@@ -13,6 +13,7 @@ class vector {
 public:
 	typedef T value_type;
 	typedef T& reference;
+	typedef T* pointer;
 	typedef	const T& const_reference;
 	typedef size_t size_type;
 	using iterator = T *;
@@ -28,13 +29,12 @@ protected:
 	size_t impl_cap;
 	Alloc alloc;
 	typedef const Alloc & _al_param;
-	template<class _T>
-	std::enable_if_t<std::conjunction_v<std::is_default_constructible<_T>>>
-	init_construct(_T* sz){while (sz!=impl_begin)alloc.construct(--sz);}
-	
-	template<class _T>
-	std::enable_if_t<!std::conjunction_v<std::is_default_constructible<_T>>>
-	init_construct(_T* sz) { }
+
+	void init_construct(T* sz){
+		if constexpr(std::is_default_constructible_v<T>)
+			while (sz!=impl_begin)alloc.construct(--sz);
+		else memset(impl_begin, 0, (sz - impl_begin) * sizeof(T));
+	}
 
 	void init_construct(size_t sz){
 		init_construct(impl_end = impl_begin + sz);
@@ -135,7 +135,8 @@ public:
 
 	allocator_type get_allocator()const{return alloc;}
 
-	vector(_al_param _alloc=Alloc()):alloc(_alloc) { init_cap(0); }
+	explicit vector(_al_param _alloc=Alloc())
+	:alloc(_alloc) { init_cap(0); }
 
 	template<class Iter>vector(Iter begin,Iter end,_al_param _a=Alloc())
 	:alloc(_a){
@@ -194,18 +195,17 @@ public:
 	void pop_front() { erase(begin()); }
 
 	void erase(iterator iter) {
-		if (size()) {
-			iterator it = iter;
-			iterator _end = end();
-			_end--;
-			while (it != _end) {
-				alloc.destroy(it);
-				alloc.construct(it,*(it + 1));
-				it++;
-			}
-			alloc.destroy(impl_end);
-			impl_end = _end;
+		erase(iter, iter + 1);
+	}
+
+	void erase(iterator _beg, iterator _end) {
+		for (auto it = _beg; it != _end; ++it)alloc.destroy(it);
+		size_t cnt = 0;
+		for (; _end + cnt != end() && _beg + cnt != _end; ++cnt) {
+			alloc.construct(_beg + cnt, _end[cnt]);
+			alloc.destroy(_end + cnt);
 		}
+		impl_end = impl_begin + _beg + cnt;
 	}
 
 	void erase(size_t pos) { erase(begin() + pos); }
