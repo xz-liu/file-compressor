@@ -6,29 +6,46 @@
 #define DATA_STRUCTURE_EXP_BINTREE_NODE_H
 
 #include <functional>
+#include <optional>
 #include <cstdlib>
 #include "queue.h"
 
-template <class T>
+template <class T,class S=void>
 struct bintree_node {
     using bnode_ptr=bintree_node *;
     using const_bnode_ptr=const bintree_node *;
     using visit_func=std::function<void(T &)> ;
-    using const_visit_func=std::function<void(const T &)> ;
+	using const_visit_func=std::function<void(const T &)> ;
     T val;
-    bintree_node *parent, *lc, *rc;
-    int node_height;
+	struct Status{
+		S * _val;
+		Status(){
+			if constexpr(!std::is_same_v<S, void>)
+				_val = new S;
+		}
+		~Status(){
+			if constexpr(!std::is_same_v<S, void>)
+				delete _val;
+		}
+		template <class _T>
+		void assign(const _T& v){*_val = v;}
+		template<class _T=S>std::enable_if_t<!std::is_same_v<_T,void>,_T>&
+			val() { return *_val; }
+		template<class _T>	void val() { }
+	}status;
+	bintree_node *parent, *lc, *rc;
+    int height;
     static int stature(bnode_ptr ptr) {
-        return ptr ? ptr->node_height : -1;
+        return ptr ? ptr->height : -1;
     }
 
     bintree_node()
-    : parent(nullptr), lc(nullptr), rc(nullptr), node_height(0){}
+    : parent(nullptr), lc(nullptr), rc(nullptr), height(0){}
 
     explicit bintree_node(const T &val, bnode_ptr parent = nullptr,
                 bnode_ptr lchild = nullptr, bnode_ptr rchild = nullptr,
                 int height = 0, int null_path_length = 1)
-    : val(val), parent(parent), lc(lchild), rc(rchild), node_height(height){}
+    : val(val), parent(parent), lc(lchild), rc(rchild), height(height){}
 
     static void move_to_lc(bnode_ptr &ptr) { ptr = ptr->lc; }
 
@@ -39,6 +56,8 @@ struct bintree_node {
     bool has_parent() const { if(!this)return true;return  parent; }
 
     bool is_root()const { return !has_parent(); }
+
+	bool is_child() const { return !this || is_child() || is_rchild(); }
 
     bool is_lchild() const{ return !is_root() && (this == parent->lc); }
 
@@ -58,12 +77,12 @@ struct bintree_node {
 
     bnode_ptr& uncle() {return parent->is_lchild() ? parent->parent->rc : parent->parent->lc; }
 	
-    void set_parent_ref(bnode_ptr ptr){	
-    	if (!this)return;
-        if (is_root())return;
-        if(is_lchild())parent->lc=ptr;
-        else parent->rc=ptr;
-    }
+	bnode_ptr set_parent_ref(bnode_ptr ptr) {
+		if (!this)return nullptr;
+		if (is_root())return this;
+		if (is_lchild())return parent->lc = ptr;
+		return parent->rc = ptr;
+	}  
 
     int size() {
         int size_now = 1;

@@ -7,16 +7,16 @@
 
 #include "bintree_node.h"
 #include <algorithm>
-template <class T>
+template <class T,class S=void>
 class bin_tree {
 protected:
-    typedef bintree_node<T> node;
-    using ptr=typename bintree_node<T>::bnode_ptr;
-    using const_ptr=typename bintree_node<T>::const_bnode_ptr;
+    typedef bintree_node<T,S> node;
+    using ptr=typename bintree_node<T,S>::bnode_ptr;
+    using const_ptr=typename bintree_node<T,S>::const_bnode_ptr;
     int tree_size;
     ptr root;
     virtual int update_height(ptr x){
-        return x->node_height=
+        return x->height=
           1+std::max(node::stature(x->lc),node::stature(x->rc));
     }
 
@@ -45,13 +45,13 @@ protected:
 
     template <class CharT>
     void pre_order_init(std::basic_istream<CharT> &in,
-                        typename bintree_node<T>::bnode_ptr &now,
-                        typename bintree_node<T>::bnode_ptr parent,
+                        typename bintree_node<T,S>::bnode_ptr &now,
+                        typename bintree_node<T,S>::bnode_ptr parent,
                         int& size,const T &sepreator) {
         T x;if (!(in >> x)) return;
         if (x == sepreator)
         { now = nullptr;return; }
-        size++;now = (new bintree_node<T>(x,parent));
+        size++;now = (new bintree_node<T,S>(x,parent));
         pre_order_init(in, now->lc,now,size, sepreator);
         pre_order_init(in, now->rc,now,size,sepreator);
 
@@ -60,8 +60,8 @@ protected:
 public:
     using visit_func=typename node::visit_func;
     using const_visit_func=typename node::const_visit_func;
-    using position= bintree_node<T>*;
-    using const_position= const bintree_node<T>*;
+    using position= bintree_node<T,S>*;
+    using const_position= const bintree_node<T,S>*;
 
     bin_tree():tree_size(0),root(nullptr){}
     virtual ~bin_tree(){clear();}

@@ -6,6 +6,8 @@
 #define DATA_STRUCTURE_EXP_STACK_H
 
 #include "vector.h"
+#include "list.h"
+#include <variant>
 
 template <class T>
 class stack: vector<T>{
@@ -28,5 +30,25 @@ public:
     }
 };
 
+template<class T>
+class stack_by_list :public list<T>{
+public:
+	stack_by_list() :list<T>() {}
+	void push(const T& val) {
+		list<T>::push_back(val);
+	}
+	void pop() {
+		list<T>::pop_back();
+	}
+	size_t size() const {
+		return list<T>::size();
+	}
+	bool empty() const {
+		return !size();
+	}
+	T& top() {
+		return list<T>::back();
+	}
+};
 
 #endif //DATA_STRUCTURE_EXP_STACK_H

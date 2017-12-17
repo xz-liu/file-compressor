@@ -110,5 +110,4 @@ inline void run_exp3_tests() {
 	cout << endl;
 };
 
-
 #endif //DATA_STRUCTURE_EXP_EXP_3_H
