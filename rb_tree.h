@@ -9,6 +9,7 @@ enum class rb_color {
 	red, black
 };
 
+
 template<class T, class Comp = std::less<>>
 class rb_tree :public bst<T, Comp, rb_color> {
 public:
