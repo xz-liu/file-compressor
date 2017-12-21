@@ -10,6 +10,7 @@ namespace DrawBinaryTree
         private T data;
         private NodeList<T> neighbors = null;
 
+
         public int Xpos
         {
             get

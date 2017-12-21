@@ -6,7 +6,6 @@
 #define DATA_STRUCTURE_EXP_QUEUE_H
 
 #include "list.h"
-#include "bin_tree.h"
 #include "vector.h"
 #include <cstdlib>
 
@@ -90,7 +89,7 @@ protected:
 public:
     explicit
     priority_queue(Comp const& comp=Comp(),Seq const& seq=Seq())
-    : comp(comp),container(seq){}
+    : container(seq), comp(comp){}
 
     size_type size() { return container.size(); }
 

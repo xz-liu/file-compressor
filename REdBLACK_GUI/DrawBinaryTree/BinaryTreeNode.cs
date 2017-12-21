@@ -4,7 +4,8 @@ namespace DrawBinaryTree
 {
     public class BinaryTreeNode<T> : Node<T>
     {
-        public BinaryTreeNode() : base() { }
+        public static int NULL_VALUE = -10;
+        public BinaryTreeNode() : base() { treeHeight = NULL_VALUE; }
         public BinaryTreeNode(T data) : base(data, null) { }
         public BinaryTreeNode(T data, BinaryTreeNode<T> left, BinaryTreeNode<T> right)
         {
@@ -15,7 +16,27 @@ namespace DrawBinaryTree
 
             base.Neighbors = children;
         }
-        public string color { get; set; }
+
+        public int treeHeight { get; set; }
+        public bool heightIsSet() { return treeHeight != NULL_VALUE; }
+
+        public JsonData valueData { get; set; }
+
+        public string color
+        {
+            get { return valueData.Type; }
+            set { valueData.Type = value; }
+        }
+        public string height
+        {
+            get { return valueData.Height; }
+            set { valueData.Height = value; }
+        }
+        public string value
+        {
+            get { return valueData.Value; }
+            set { valueData.Value = value; }
+        }
 
         public BinaryTreeNode<T> Left
         {

@@ -14,6 +14,8 @@ void output_list(const Seq &list) {
 using uint = unsigned int;
 using ulong = unsigned long long;
 
+#define var auto
+
 #ifdef _MSC_VER
 //Visual Studio
 

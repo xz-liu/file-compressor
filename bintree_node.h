@@ -9,7 +9,13 @@
 #include <optional>
 #include <cstdlib>
 #include "queue.h"
-
+#include "basic.h"
+/**
+ * binary node class template
+ * T for data, and S for node status(optional)
+ * node for all binary trees
+ * implements lots of ordinary binary tree operations
+ */
 template <class T,class S=void>
 struct bintree_node {
     using bnode_ptr=bintree_node *;
@@ -17,24 +23,31 @@ struct bintree_node {
     using visit_func=std::function<void(T &)> ;
 	using const_visit_func=std::function<void(const T &)> ;
     T val;
-	struct Status{
-		S * _val;
-		Status(){
-			if constexpr(!std::is_same_v<S, void>)
-				_val = new S;
+	//an optional status type
+	//if not needed 
+	//the second template parameter should be void
+	struct optional_status{
+		S * _val;//a pointer to the status
+		static constexpr bool is_used() {//check if status is needed
+			return(!std::is_same_v<S, void>);
 		}
-		~Status(){
-			if constexpr(!std::is_same_v<S, void>)
-				delete _val;
+		optional_status(){//if needed allocate memory for status
+			if constexpr(is_used())	_val = new S;
 		}
-		template <class _T>
+		~optional_status(){//if needed deallocate memory of status
+			if constexpr(is_used())delete _val;
+		}
+		template <class _T>//assign a value to status
 		void assign(const _T& v){*_val = v;}
+		//get status value
 		template<class _T=S>std::enable_if_t<!std::is_same_v<_T,void>,_T>&
 			val() { return *_val; }
 		template<class _T>	void val() { }
 	}status;
+	//parent,lchild,rchild
 	bintree_node *parent, *lc, *rc;
-    int height;
+	int height;//node height
+	//define the height for null node as -1 
     static int stature(bnode_ptr ptr) {
         return ptr ? ptr->height : -1;
     }
@@ -44,7 +57,7 @@ struct bintree_node {
 
     explicit bintree_node(const T &val, bnode_ptr parent = nullptr,
                 bnode_ptr lchild = nullptr, bnode_ptr rchild = nullptr,
-                int height = 0, int null_path_length = 1)
+                int height = 0)
     : val(val), parent(parent), lc(lchild), rc(rchild), height(height){}
 
     static void move_to_lc(bnode_ptr &ptr) { ptr = ptr->lc; }
@@ -76,21 +89,36 @@ struct bintree_node {
     bnode_ptr& sibling() { return is_lchild() ? parent->rc : parent->lc; }
 
     bnode_ptr& uncle() {return parent->is_lchild() ? parent->parent->rc : parent->parent->lc; }
-	
+
+	//set the parent's reference of this node to another node
 	bnode_ptr set_parent_ref(bnode_ptr ptr) {
 		if (!this)return nullptr;
 		if (is_root())return this;
 		if (is_lchild())return parent->lc = ptr;
 		return parent->rc = ptr;
 	}  
-
+	//get size (this as root)
     int size() {
         int size_now = 1;
         if (lc)size_now += lc->size();
         if (rc)size_now += rc->size();
         return size_now;
     }
-
+	//inorder predecessor
+	//used in iterator (++)
+	bnode_ptr prev() {
+		bnode_ptr s = this;
+		if (rc) {
+			s = rc;
+			while (s->has_rchild())move_to_rc(s);
+		} else {
+			while (s->is_lchild())move_to_parent(s);
+			move_to_parent(s);
+		}
+		return s;
+    }
+	//inorder successor
+	//used in iterator (--)
     bnode_ptr next() {
         bnode_ptr s = this;
         if (rc) {
@@ -103,7 +131,9 @@ struct bintree_node {
         return s;
     }
 
-    const_bnode_ptr& next()const{ return (const_cast<bnode_ptr >(this))->next(); }
+	const_bnode_ptr& next()const { return (const_cast<bnode_ptr >(this))->next(); }
+
+	const_bnode_ptr& prev()const { return (const_cast<bnode_ptr >(this))->prev(); }
 
     bnode_ptr& insert_as_lchild(T const &val) { return lc = new bintree_node(val, this); }
 
@@ -113,6 +143,7 @@ struct bintree_node {
 
     bool operator==(bintree_node const &bn) const { return val == bn.val; }
 
+//implementing traversal
 #define _BASE if (!this)return;
 #define _VIS visit(val);
 #define _NEXT_CHILD(child_type,trav_type) \
@@ -127,6 +158,7 @@ struct bintree_node {
     _BINTREE_NODE_TRAV(post, _NEXT_CHILD(lc,post)_NEXT_CHILD(rc,post)_VIS)
 
 #undef _BINTREE_NODE_TRAV
+//level traversal
 #define _BINTREE_NODE_TRAV_LEVEL(prefix,attr)\
     void trav_level(prefix##visit_func visit) attr{\
         queue<prefix##bnode_ptr> Q;Q.push(this);\

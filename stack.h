@@ -7,7 +7,6 @@
 
 #include "vector.h"
 #include "list.h"
-#include <variant>
 
 template <class T>
 class stack: vector<T>{
