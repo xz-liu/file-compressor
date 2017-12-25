@@ -2,13 +2,12 @@
 #include <ctime>
 #include <cinttypes>
 #include <filesystem>
-#include "../DATA_STRUCTURE_EXP/huffman.h"
+#include "huffman.h"
 #include <bitset>
 
-int main(int argc, char** argv) {
+int zip_main(int argc, char** argv) {
 	using namespace std;
 	time_t time_now = time(nullptr);
-	if (argc < 3)return 0;
 #define CHAR_TYPE uint8_t
 	basic_ifstream<CHAR_TYPE> input(argv[1], ios::binary);
 	basic_ofstream<CHAR_TYPE> output(argv[2], ios::binary);
@@ -16,9 +15,14 @@ int main(int argc, char** argv) {
 	map<CHAR_TYPE, size_t> char_cnts;
 	map<CHAR_TYPE, huffman<CHAR_TYPE>::code_ref> char_code;
 	if (is_decompress) {
-		auto res = huffman<CHAR_TYPE>::read(input, output);
-		char_cnts = res.counts();
-		char_code = res.encoding();
+		try {
+			auto res = huffman<CHAR_TYPE>::read(input, output);
+			char_cnts = res.counts();
+			char_code = res.encoding();
+		}catch(...) {
+			cout << "Decompress failed!";
+			return 0;
+		}
 	}
 	else {
 		auto res = huffman<CHAR_TYPE>(input);

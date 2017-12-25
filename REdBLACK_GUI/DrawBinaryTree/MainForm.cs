@@ -17,6 +17,8 @@ namespace DrawBinaryTree
         private Pen blackPen;
         private SolidBrush blackBrush;
         private string valueNow;
+        private bool found = false;
+        private bool isSelected = false;
         Process process;
         Dictionary<PointF,JsonData> map;
 
@@ -47,6 +49,7 @@ namespace DrawBinaryTree
         private BinaryTreeNode<string> CreateTreeImpl(List<JsonData> lst)
         {
             if (lst.Count == 0) return null;
+            if (Char.IsLower(lst[0].Type[0])) found = true;
             if (lst[0].Type == "N")
             {
                 lst.Remove(lst[0]);
@@ -60,6 +63,8 @@ namespace DrawBinaryTree
             return r;
         }
 
+        bool isNumeric(string s) { return double.TryParse(s, out var n); }
+
         private void CreateTree(List<JsonData> lst)
         {
             root = CreateTreeImpl(lst);
@@ -72,15 +77,17 @@ namespace DrawBinaryTree
         public MainForm()
         {
             InitializeComponent();
+
             panel1.Paint += new PaintEventHandler(panel1_Paint);
-            panel1.SizeChanged += new EventHandler(panel1_SizeChanged);
             panel1.Font = new Font("Tahoma", 12.0f, FontStyle.Regular);
             outFont = new Font("Tahoma", 12.3f, FontStyle.Regular);
-            blackPen = new Pen(Color.Black,2f);
+            blackPen = new Pen(Color.White,2f);
             blackPen.DashStyle = System.Drawing.Drawing2D.DashStyle.Custom;
             blackPen.DashPattern = new float[] { 10f, 10f };
             blackBrush = new SolidBrush(Color.Black);
             nodeInfo.BringToFront();
+            SetStyle(ControlStyles.AllPaintingInWmPaint, true);
+            SetStyle(ControlStyles.UserPaint, true);
             map = new Dictionary<PointF, JsonData>();
             try
             {
@@ -100,11 +107,13 @@ namespace DrawBinaryTree
             }
             catch (Exception e){
                 MessageBox.Show(e.Message, "Error!");
-                Application.Exit();
+                this.Close();
+                Environment.Exit(0);
             }
         }
         private void ParseMessage(string message)
         {
+            previus = "";
             process.StandardInput.WriteLine(message);
             treesize.Text = "Size : " + process.StandardOutput.ReadLine();
 
@@ -113,37 +122,38 @@ namespace DrawBinaryTree
             CreateTree(jsonData);
             repaintPanel();
         }
-
-        private void panel1_SizeChanged(object sender, EventArgs e)
-        {
-            repaintPanel();
-        }
-
+        
         private void repaintPanel()
         {
             map.Clear();
-            panel1.Invalidate();
+            if (!sizeNow.Equals(this.Size))
+            {
+                panel1.Invalidate();
+                needRepaint = true;
+            }
+        }
+
+        private void resetFound() { found = false; }
+
+        private void foundMessage(bool isDelete)
+        {
+            if (!found)
+            {
+                MessageBox.Show( "What you want to " +
+                    (isDelete ? "delete" : "find") + " does not exist", "Not good!");
+            }
+           
         }
 
         public void DrawTree(BinaryTreeNode<string> root, Graphics g)
         {
-            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-            panel1.Width = ClientSize.Width - 8;
-            panel1.Height = ClientSize.Height - 8;
-            Color[] outsideByHeight = new Color[]{
-                Color.Red,
-                Color.Orange,
-                Color.Yellow,
-                Color.Green,
-                Color.LimeGreen,
-                Color.Blue,
-                Color.Purple
-            };
+            panel1.Width = ClientSize.Width - 25;
+            panel1.Height = ClientSize.Height - 80;
             int treeHeight = TreeHeight(root);
-            Color outside = outsideByHeight[(uint)treeHeight % 7];
+            Color outside = Color.White;//outsideByHeight[(uint)treeHeight % 7];
             Color inside = Color.Black;
             Pen[] lines = {
-                new Pen(outside,4),
+                new Pen(outside,6),
                 new Pen(inside,2)
             };
             int Width = panel1.Width-20;
@@ -170,7 +180,10 @@ namespace DrawBinaryTree
                     dx2 = root.Left.Xpos * XSCALE;
                     dy2 = root.Left.Ypos * YSCALE + yShift;
                     foreach (var p in lines)
+                        //g.DrawLine(p, new Point(dx, dy), new Point(dx2, dy2));
                         g.DrawBezier(p, new Point(dx, dy), new Point(dx2, dy), new Point(dx2, dy), new Point(dx2, dy2));
+                    //g.DrawBezier(p, new Point(dx, dy), new Point(dx, dy), new Point(dx2, dy2), new Point(dx2, dy2));
+
                 }
 
                 if (root.Right != null)
@@ -178,20 +191,17 @@ namespace DrawBinaryTree
                     dx2 = root.Right.Xpos * XSCALE;
                     dy2 = root.Right.Ypos * YSCALE + yShift;
                     foreach (var p in lines)
+                        //g.DrawLine(p, new Point(dx, dy), new Point(dx2, dy2));
                         g.DrawBezier(p, new Point(dx, dy), new Point(dx2, dy), new Point(dx2, dy), new Point(dx2, dy2));
                 }
                 var layout = new RectangleF(dx - ys / 2, dy - ys / 2, ys, ys);
                 if (Char.IsLower(root.valueData.Type[0])) {
                     g.DrawLine(blackPen, dx, 0, dx, panel1.Height);
                     g.DrawLine(blackPen, 0, dy, panel1.Width, dy);
-                    g.FillEllipse(new SolidBrush(
-                    Color.Blue),  new RectangleF(dx - ys / 2 - 3, dy - ys / 2 - 3, ys + 6, ys + 6));
                 }
-                else
-                {
                     g.FillEllipse(new SolidBrush(
                     outside), new RectangleF(dx - ys / 2 - 2, dy - ys / 2 - 2, ys + 4, ys + 4));
-                }
+                
                 PointF now = new PointF(dx - ys / 2, dy - ys / 2), nowCenter = new PointF(dx, dy);
                 if (!map.ContainsKey(nowCenter))map.Add(nowCenter, root.valueData);
                 g.FillEllipse( new SolidBrush(thisColor), layout);
@@ -202,35 +212,39 @@ namespace DrawBinaryTree
             }
         }
 
+        private bool checkInput(string front)
+        {
+            resetFound();
+            if (isNumeric(input.Text)){
+                ParseMessage(front + input.Text);
+                return true;
+            }
+            MessageBox.Show("Invalid input", "Error!");
+            return false;
+        }
+
         private void ins_Click(object sender, EventArgs e)
         {
-            ParseMessage("i" + input.Text);
+            checkInput("i");
         }
 
         private void find_Click(object sender, EventArgs e)
         {
-            ParseMessage("f" + input.Text);
+            if (checkInput("f"))
+                foundMessage(false);
         }
 
         private void erase_Click(object sender, EventArgs e)
         {
-            ParseMessage("e" + input.Text);
+            checkInput("e");
         }
 
         private void clear_Click(object sender, EventArgs e)
         {
             ParseMessage("c");
         }
-
-        private void MainForm_SizeChanged(object sender, EventArgs e)
-        {
-            repaintPanel();
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            ParseMessage("r");
-        }
+        
+        
 
         private bool inCircle(PointF center, PointF point)
         {
@@ -244,31 +258,67 @@ namespace DrawBinaryTree
                 if (inCircle(i.Key, new PointF(e.X, e.Y)))
                 {
                     String color = i.Value.Type.ToUpper() == "R" ? "Red" : "Black";
-                    nodeInfo.Visible = true;
-                    nodeInfo.Location = new Point((int)i.Key.X+panel1.Location.X+10,(int)i.Key.Y+panel1.Location.Y+10);
+                    nodeInfo.Location = new Point((int)i.Key.X + panel1.Location.X + 10, (int)i.Key.Y + panel1.Location.Y + 10);
                     nodeInfo.Text =
                         "Value : " + i.Value.Value + "\n" +
                         "Color : " + color + "\n" +
                         "Height: " + i.Value.Height;
+                    nodeInfo.Visible = true;
                     nodeInfo.Invalidate();
+                    isSelected = true;
                     valueNow = i.Value.Value;
                     return;
                 }
             }
+            isSelected = false;
             nodeInfo.Visible = false;
             nodeInfo.Invalidate();
         }
 
         private void panel1_MouseDown(object sender, MouseEventArgs e)
         {
-            input.Text = valueNow;
-            input.Invalidate();
+            if (isSelected)
+            {
+                input.Text = valueNow;
+                input.Invalidate();
+            }
+        }
+
+        private void rand_Click(object sender, EventArgs e)
+        {
+            ParseMessage("r");
+        }
+
+        private bool needRepaint = false;
+        private Size sizeNow;
+
+        private void MainForm_ResizeEnd(object sender, EventArgs e)
+        {
+            repaintPanel();
+        }
+
+        private void MainForm_ResizeBegin(object sender, EventArgs e)
+        {
+            sizeNow = this.Size;
+            needRepaint = false;
+        }
+        string previus = "";
+
+        private void input_TextChanged(object sender, EventArgs e)
+        {
+            if (input.Text.Length == 0 || isNumeric(input.Text))
+                previus = input.Text;
+            else input.Text = previus;
         }
 
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
-            if (root != null)
-                DrawTree(root, e.Graphics);
+            if (needRepaint)
+            {
+                e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                if (root != null)
+                    DrawTree(root, e.Graphics);
+            }
         }
 
     }

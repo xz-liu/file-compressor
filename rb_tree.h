@@ -23,11 +23,13 @@ class rb_tree :public _Base {
 public:
 	using position = typename bst<T, Comp, rb_color>::position;
 protected:
-	static bool is_black(position p) {
+	static bool is_black(position p) {//nullptr is colored black
 		return (!(p) || (rb_color::black == color(p)));
 	}
 	static bool is_red(position p) { return !is_black(p); }
+	//get current color
 	static rb_color& color(position p) { return p->status.val(); }
+	//set current color
 	static rb_color set_color(position p, rb_color c) {
 		p->status.assign(c);return c;
 	}
@@ -80,7 +82,7 @@ protected:
 			position t = nullptr;
 			if (is_red(s->rc))t = s->rc;
 			if (is_red(s->lc))t = s->lc;
-			if (t) {//case BB-1 : sibling is black and has at least a red child
+			if (t) {//case BB-1 : sibling is black and has at least one red child
 				//let s's color be p's color and rotate
 				rb_color old = color(p);
 				position b = GET_PARENT_REF(p) = this->rotate_at(t);
@@ -154,6 +156,7 @@ protected:
 	}
 	//override update height
 	int update_height(position x) override{
+		//height increases only when x is black
 		x->height = std::max(stature(x->lc), stature(x->rc));
 		return is_black(x) ? x->height++ : x->height;
 	}
@@ -183,6 +186,8 @@ public:
 
 	size_t size() { return this->tree_size; }
 
+	// user interface part
+	// output a node's info
 	template<class Out>
 	static Out& output_pos_info(Out& out, position p,position found=nullptr) {
 		out << R"({"C":)";
@@ -192,6 +197,7 @@ public:
 			<< p->val;
 		return out << R"(","H":")"<< p->height << R"("},)";
 	}
+	// pre-order traverse the tree and output info as json text
 	template <class Out>
 	static void output_pos(Out& out, position p,position found=nullptr) {
 		output_pos_info(out, p,found);

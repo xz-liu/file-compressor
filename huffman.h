@@ -135,7 +135,7 @@ private:
 	template<class Out>
 	size_t get_original(const std::vector<bool> &bits, size_t rank, Out &out, ptr now) {
 		if (rank >= bits.size())return rank;//read to end of file
-		if (!para_size)return 0;//all chars read
+		if (!para_size)return bits.size();//all chars read
 		if (now->is_leaf()) {//reach an actual char
 			write_obj(out, now->val);
 			para_size--;//chars that should read decrease by 1
@@ -151,7 +151,9 @@ private:
 		int rank = 0;
 		while (rank < bits.size() && para_size) {
 			//update position that has been read
-			rank = get_original(bits, rank, out, this->root);
+			int new_rank = get_original(bits, rank, out, this->root);
+			if (new_rank == rank)throw std::exception();
+			rank = new_rank;
 		}
 	}
 
@@ -233,6 +235,8 @@ public:
 		//read header
 		int para_size = read_obj<size_t>(in);
 		int codes_size = read_obj<size_t>(in);
+		if (para_size <= 0 || codes_size <= 0)
+			throw std::exception();
 		map<code_ref, CharT> codes;
 		while (codes_size--) {
 			auto first = read_obj<CharT>(in);

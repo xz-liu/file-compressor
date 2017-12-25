@@ -119,7 +119,7 @@ namespace DS_ZIP_GUI
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "a.exe",
+                    FileName = "DS_EXP_PROJECT.exe",
                     Arguments = _in + " " + _out + (_d ? " d" : ""),
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
@@ -154,9 +154,16 @@ namespace DS_ZIP_GUI
             });
             Task.Run(() =>
             {
-                DateTime time = DateTime.Now;
-                proc.Start();
-                s = proc.StandardOutput.ReadToEnd();
+                try
+                {
+                    DateTime time = DateTime.Now;
+                    proc.Start();
+                    s = proc.StandardOutput.ReadToEnd();
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Error", "Something went wrong");
+                }
             });
         }
 

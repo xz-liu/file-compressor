@@ -5,10 +5,11 @@
 #include <string>
 #include <ctime>
 
-int main() {
+int rb_main() {
 	using namespace std;
 	rb_tree < double > rb;
 	string s; double d;
+	srand(time(nullptr));
 	while(getline(cin,s)) {
 		rb_tree<double>::position ptr = nullptr;
 		switch (s[0]) {
@@ -29,11 +30,11 @@ int main() {
 			rb.clear();
 			break;
 		case 'r':
-			srand(time(nullptr));
 			rb.clear();
-			const size_t cnt = rand() % 100 + 1;
+			const size_t max_size = 50;
+			const size_t cnt = rand() % max_size + 1;
 			for (size_t i = 0; i < cnt; ++i) {
-				rb.insert(rand() % 100);
+				rb.insert(rand() % max_size);
 			}
 		}
 		rb.output_tree(cout, ptr);
