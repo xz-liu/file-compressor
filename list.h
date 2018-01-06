@@ -7,7 +7,10 @@
 
 #include "list_node.h"
 #include <initializer_list>
-
+/**
+ * List
+ * A container imitating std::list
+ */
 template<class T>
 class list {
 protected:

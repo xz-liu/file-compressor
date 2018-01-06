@@ -64,7 +64,7 @@ protected:
 	}
 	// reconnect nodes
 	// connect a with T0 and T1, c with T2 and T3, b with a and c
-	// return b, which has become local root
+	// returns b, which has become local root
 	position reconnect_nodes(position a, position b, position c,
 		position T0, position T1, position T2, position T3) {
 #define CONNECT(par,ch_type,child)\

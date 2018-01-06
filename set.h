@@ -4,6 +4,7 @@
 #define DATA_STRUCTURE_EXP_SET_H
 #include <functional>
 #include "rb_container_base.h"
+
 template <class T, class Comp = std::less<>,
 	class _Base=rb_container_base<T,Comp,
 	univ_bst_iter<T,T>,

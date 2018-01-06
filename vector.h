@@ -6,8 +6,12 @@
 #define DATA_STRUCTURE_EXP_VECTOR_H
 #include <memory>
 #include <iterator>
+#include <cstring>
 #include <type_traits>
-
+/**
+ * Vector 
+ * A container type imitating std::vector
+ */
 template<class T, class Alloc=std::allocator<T>>
 class vector {
 public:
@@ -31,7 +35,7 @@ protected:
 	typedef const Alloc & _al_param;
 
 	void init_construct(T* sz){
-		if constexpr(std::is_default_constructible_v<T>)
+		if (std::is_default_constructible_v<T>)
 			while (sz!=impl_begin)alloc.construct(--sz);
 		else memset(impl_begin, 0, (sz - impl_begin) * sizeof(T));
 	}

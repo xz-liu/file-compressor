@@ -19,7 +19,8 @@
 
 /**
  * huffman tree
- * implements compression and decompression using huffman tree
+ * implements compression and decompression
+ * using huffman tree data structure
  */
 template<class CharT = char>
 class huffman : public bin_tree<CharT>, binary_io {

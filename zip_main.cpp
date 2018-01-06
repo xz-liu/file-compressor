@@ -1,7 +1,7 @@
 #include <iostream>
 #include <ctime>
 #include <cinttypes>
-#include <filesystem>
+#include <experimental/filesystem>
 #include "huffman.h"
 #include <bitset>
 
@@ -33,7 +33,7 @@ int zip_main(int argc, char** argv) {
 	input.close();
 	output.close();
 	
-	namespace fs = std::experimental::filesystem;
+	namespace fs = experimental::filesystem;
 	cout <<"Time : "<< (time(nullptr) - time_now) <<"   Compression Rate : "<<
 		static_cast<double>(fs::file_size(fs::path(argv[is_decompress?1:2])))/
 		file_size(fs::path(argv[is_decompress?2:1]))<< endl;

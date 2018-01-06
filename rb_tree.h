@@ -215,7 +215,7 @@ public:
 	}
 	template<class Out>
 	friend Out& operator<<(Out& out, rb_tree& tree) {
-		return output_tree(out, tree.root);
+		return tree.output_tree(out, tree.root);
 	}
 };
 

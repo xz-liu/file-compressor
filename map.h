@@ -4,7 +4,10 @@
 #include <iterator>
 #include "rb_tree.h"
 #include "rb_container_base.h"
-
+/**
+ * Comparer 
+ * used to compare the first element of std::pair 
+ */
 template <class Comp> struct comp_first {
 	Comp comp;
 	comp_first( Comp const& comp=Comp()):comp(comp){}
@@ -16,6 +19,11 @@ template <class Comp> struct comp_first {
 	}
 };
 
+/**
+* Map
+* A container imitating std::map
+* implemented using red black tree
+*/
 template<class Key, class Value, class Comp = std::less<>>
 struct map :rb_container_base< std::pair< Key, Value>, comp_first<Comp>,
 	univ_bst_iter<std::pair< Key, Value>>,
