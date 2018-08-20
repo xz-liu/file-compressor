@@ -5,13 +5,13 @@ studying data structure
 
 file compressor 
 
-![image](http://github.com/joker-xii/ds_exp/raw/GUI/demo/zip.jpg)
+![image](http://github.com/joker-xii/ds_exp/raw/master/demo/zip.jpg)
 
 ## rbtree demo
 
 A demo for red-black tree
 
-![image](http://github.com/joker-xii/ds_exp/raw/GUI/demo/rbtree.png)
+![image](http://github.com/joker-xii/ds_exp/raw/master/demo/rbtree.png)
 
 ## containers
 
