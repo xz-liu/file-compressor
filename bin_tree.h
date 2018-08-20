@@ -40,14 +40,14 @@ protected:
 	//leftmost node in a tree
 	//used in implementing iterator(begin)
     ptr& begin_node()const{
-        ptr& x= const_cast<ptr&>(root);
+        auto x=root;
         while (x->has_lchild())node::move_to_lc(x);
         return x;
     }
 	//rightmost node in a tree
 	//used in implementing iterator(rbegin)
     ptr& end_node()const {
-		ptr& x = const_cast<ptr&>(root);
+        auto x=root;
         while (x->has_rchild())node::move_to_rc(x);
         return x;
     }

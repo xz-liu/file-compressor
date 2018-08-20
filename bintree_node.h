@@ -26,25 +26,24 @@ struct bintree_node {
 	//an optional status type
 	//if not needed 
 	//the second template parameter should be void
-	template<class _T>
 	struct optional_status{
-		_T _val;
-		//check if status is needed
-		static constexpr bool is_used(){return true;}
-		template <class _InputTy>//assign a value to status
-		void assign(const _InputTy& v){_val = v;}
+		S * _val;//a pointer to the status
+		static constexpr bool is_used() {//check if status is needed
+			return(!std::is_same_v<S, void>);
+		}
+		optional_status(){//if needed allocate memory for status
+			if constexpr(is_used())	_val = new S;
+		}
+		~optional_status(){//if needed deallocate memory of status
+			if constexpr(is_used())delete _val;
+		}
+		template <class _T>//assign a value to status
+		void assign(const _T& v){*_val = v;}
 		//get status value
-	 	_T& val() { return _val; }
-		operator _T () { return val(); };
-		template <class _InputTy>
-		optional_status& operator=(_InputTy const& v) 
-		{ assign(v); }
-	};
-	template<>struct optional_status<void> {
-		//status is not used
-		static constexpr bool is_used() {return false;}
-	};
-	optional_status<S> status;
+		template<class _T=S>std::enable_if_t<!std::is_same_v<_T,void>,_T>&
+			val() { return *_val; }
+		template<class _T>	void val() { }
+	}status;
 	//parent,lchild,rchild
 	bintree_node *parent, *lc, *rc;
 	int height;//node height
