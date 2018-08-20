@@ -5,13 +5,13 @@ studying data structure
 
 file compressor 
 
-![image](http://github.com/joker-xii/ds_exp/raw/master/demo/zip.jpg)
+![image](https://raw.githubusercontent.com/joker-xii/ds_exp/master/demo/zip.jpg)
 
 ## rbtree demo
 
 A demo for red-black tree
 
-![image](http://github.com/joker-xii/ds_exp/raw/master/demo/rbtree.png)
+![image](https://raw.githubusercontent.com/joker-xii/ds_exp/master/demo/rbtree.png)
 
 ## containers
 
@@ -51,4 +51,29 @@ supported functions
     emplace(Iter where,Args&&... args)
     emplace_back(Args&&... args)
     get_allocator()
+```
+### list
+supported functions
+```
+    list()
+    list(std::initializer_list<T> init)
+    list(list const&)
+    operator=(list const&)
+    operator[](size_t)
+    begin()
+    end()
+    cbegin()
+    cend()
+    size()
+    empty()
+    clear()
+    find(T const&)
+    push_back(T const&)
+    pop_back()
+    push_front(T const&)
+    pop_front()
+    erase(Iter)
+    front()
+    back()
+    insert(Iter,T const&)
 ```
